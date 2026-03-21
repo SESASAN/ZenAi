@@ -1,0 +1,50 @@
+.row {
+    display: flex;
+    width: 100%;
+}
+
+.userRow {
+    justify-content: flex-end;
+}
+
+.assistantRow {
+    justify-content: flex-start;
+}
+
+.bubble {
+    max-width: min(720px, 82%);
+    padding: 14px 16px;
+    border-radius: 20px;
+    border: 1px solid transparent;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+    backdrop-filter: blur(8px);
+}
+
+.userBubble {
+    background: linear-gradient(180deg, rgba(0, 229, 255, 0.18), rgba(0, 175, 220, 0.12));
+    border-color: rgba(0, 229, 255, 0.25);
+    color: #effcff;
+    box-shadow: 0 0 14px rgba(0, 229, 255, 0.08);
+}
+
+.assistantBubble {
+    background: rgba(15, 23, 42, 0.88);
+    border-color: rgba(148, 163, 184, 0.18);
+    color: #dce9f5;
+}
+
+.meta {
+    margin-bottom: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.8;
+}
+
+.content {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+}

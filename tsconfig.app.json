@@ -14,8 +14,6 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
-    
-    "ignoreDeprecations": "6.0",
 
     "strict": true,
     "noUnusedLocals": true,
