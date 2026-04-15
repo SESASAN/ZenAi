@@ -1,76 +1,88 @@
 # ZenAI
 
-ZenAI es una interfaz web de chat diseñada para interactuar con modelos de Inteligencia Artificial de manera simple, moderna y escalable.
+ZenAI es una aplicación web conversacional orientada a interactuar con modelos de inteligencia artificial desde una interfaz clara, moderna y escalable.
 
-Este proyecto forma parte del Proyecto Final del diplomado en Desarrollo Fullstack y se desarrolla de forma incremental, evolucionando desde una maqueta estática hasta una aplicación completa basada en componentes.
+El proyecto está construido con una base **frontend + backend dentro del mismo repositorio**, con separación de responsabilidades entre UI, lógica de chat e integración con proveedores LLM.
 
----
+## Objetivo
 
-## Estado actual del proyecto
+ZenAI busca ofrecer una experiencia de chat donde el usuario pueda:
 
-Actualmente el proyecto se encuentra en la fase de componentización con React y TypeScript. En esta etapa ya se implementaron:
+- enviar mensajes desde una interfaz simple y cuidada,
+- recibir respuestas generadas por un modelo de IA,
+- evolucionar hacia historial, autenticación, persistencia y selección de modelos,
+- mantener una arquitectura entendible y preparada para crecer.
 
-- Estructura base en React
-- Sistema de componentes reutilizables
-- Interfaz inicial de chat funcional (sin integración de API)
-- Navbar con interacción visual
-- Uso de CSS Modules para encapsulación de estilos
-- Organización basada en Component Colocation
+## Stack principal
 
----
+- **React**
+- **TypeScript**
+- **Vite**
+- **Firebase**
+- **Groq / Cerebras** como proveedores LLM
+- **CSS Modules**
 
-## Descripción del Proyecto
+## Arquitectura
 
-ZenAI es una aplicación web tipo chat que permite a los usuarios enviar mensajes y recibir respuestas generadas por un modelo de inteligencia artificial.
+El proyecto sigue un enfoque de **monolito modular**.
 
-En esta fase:
+### Frontend
 
-- Se construye la base de la interfaz conversacional
-- Se implementa el flujo de mensajes (usuario → sistema)
-- Se define una arquitectura escalable para futuras integraciones
+El frontend vive en `src/` y se encarga de:
 
-La aplicación está diseñada bajo:
+- renderizar la interfaz conversacional,
+- manejar estado local de la UI,
+- componer componentes reutilizables,
+- conectarse con el backend mediante un contrato HTTP.
 
-- enfoque Mobile First
-- arquitectura modular
-- separación clara de responsabilidades
+### Backend
 
----
+El backend vive en `functions/` y concentra:
 
-## Características actuales
+- validación de requests,
+- orquestación del flujo de chat,
+- integración con proveedores de IA,
+- manejo de errores,
+- persistencia opcional de conversaciones.
 
-- Interfaz de chat conversacional
-- Burbujas de mensaje diferenciadas (usuario / sistema)
-- Input de texto con botón de envío reutilizable
-- Render dinámico de mensajes con useState
-- Navbar con interacción visual
-- Estilos encapsulados con CSS Modules
+### Principios aplicados
 
----
+- separación entre infraestructura y UI,
+- responsabilidades explícitas,
+- contrato estable entre cliente y backend,
+- desacople del proveedor LLM,
+- evolución gradual sin romper la base.
 
-## Características planeadas
-
-- Integración con API de modelos de lenguaje
-- Streaming de respuestas en tiempo real
-- Persistencia de conversaciones
-- Autenticación de usuarios
-- Selector de modelo
-- Historial de chats
-- Personalización de la interfaz
-
----
-
-## Estructura del Proyecto
+## Estructura del proyecto
 
 ```bash
-src/
-├── assets/
-├── components/
-├── styles/
-├── App.tsx
-├── main.tsx
+.
+├── docs/
+├── functions/
+│   └── src/
+│       ├── chat/
+│       │   ├── application/
+│       │   ├── domain/
+│       │   ├── infrastructure/
+│       │   └── presentation/
+│       └── local-server.ts
+├── skills/
+├── src/
+│   ├── components/
+│   ├── services/
+│   ├── App.tsx
+│   └── main.tsx
+├── firebase.json
+├── package.json
+└── README.md
 ```
-Cada componente sigue el patrón:
+
+## Frontend
+
+La interfaz está organizada con enfoque de **component colocation**, donde cada componente mantiene cerca sus tipos, constantes y estilos.
+
+Patrón habitual:
+
 ```bash
 Componente/
 ├── Componente.tsx
@@ -80,51 +92,117 @@ Componente/
 └── index.ts
 ```
 
----
+## Backend de chat
 
-## Tecnologías Utilizadas
-- React
-- TypeScript
-- Vite
-- CSS Modules
-- Git y GitHub
+El backend expone un flujo orientado a chat y soporta una abstracción de proveedores compatible con Groq y Cerebras.
 
----
+### Responsabilidades del backend
 
-## Instalación y Uso
-Clonar el repositorio:
-```bash
-git clone https://github.com/TU-USUARIO/zenai.git
-```
-Entrar al proyecto:
-```bash
-cd zenai
-```
-Instalar dependencias:
+- recibir mensajes del frontend,
+- validar el payload,
+- elegir el provider configurado,
+- ejecutar la generación de respuesta,
+- devolver un formato homogéneo al cliente,
+- persistir la conversación cuando corresponda.
+
+### Endpoint principal
+
+- `POST /chat`
+
+### Endpoint local de salud
+
+- `GET /health`
+
+## Ejecución local
+
+### Frontend
+
+Desde la raíz del proyecto:
+
 ```bash
 npm install
-```
-Ejecutar el proyecto:
-```bash
 npm run dev
 ```
 
----
+### Backend local
 
-## Enfoque de arquitectura
+Desde `functions/`:
 
-El proyecto utiliza:
+```bash
+npm install
+npm run dev:local
+```
 
-- Component Colocation: cada componente contiene sus estilos, tipos y constantes
-- Flujo de datos unidireccional
-- Separación entre estado local y estado global
-- Componentes reutilizables y desacoplados
+El backend local queda disponible en:
 
-Esto permite escalar el proyecto hacia una aplicación más compleja sin perder organización.
+```bash
+http://localhost:3001
+```
 
-Roadmap del Proyecto
-- Fase 1: Maquetación base
-- Fase 2: Interactividad básica
-- Fase 3: React y TypeScript (actual)
-- Fase 4: Integración con API de IA
-- Fase 5: Persistencia y autenticación
+## Variables de entorno
+
+El backend local utiliza credenciales desde el archivo `.env` de la raíz del proyecto.
+
+Variables esperadas:
+
+```bash
+GROQ_API_KEY=
+CEREBRAS_API_KEY=
+```
+
+La configuración del frontend para Firebase utiliza las variables `VITE_FIREBASE_*`.
+
+## Ejemplo de request
+
+```json
+{
+  "provider": "groq",
+  "messages": [
+    { "role": "system", "content": "Sos un asistente útil." },
+    { "role": "user", "content": "Necesito ayuda con mi proyecto." }
+  ]
+}
+```
+
+## Ejemplo de response
+
+```json
+{
+  "message": {
+    "role": "assistant",
+    "content": "Claro. Contame qué parte querés resolver primero."
+  },
+  "provider": "groq",
+  "model": "llama-3.3-70b-versatile",
+  "usage": {
+    "promptTokens": 0,
+    "completionTokens": 0,
+    "totalTokens": 0
+  }
+}
+```
+
+## Documentación complementaria
+
+- [`docs/backend-chat.md`](docs/backend-chat.md): contrato y ejecución del backend de chat.
+- [`skills/firebase/SKILL.md`](skills/firebase/SKILL.md): guía del proyecto para integración con Firebase.
+
+## Roadmap
+
+- conexión completa del frontend al backend real,
+- persistencia de conversaciones,
+- autenticación de usuarios,
+- historial de chats,
+- selector de modelo y proveedor,
+- streaming de respuestas,
+- estrategia de deploy del backend.
+
+## Filosofía del proyecto
+
+ZenAI prioriza:
+
+- fundamentos antes que parches rápidos,
+- diseño claro antes que acoplamiento accidental,
+- arquitectura entendible antes que complejidad prematura.
+
+Porque sí: hacer que algo funcione importa, pero hacerlo de forma que **se pueda mantener** importa más.
