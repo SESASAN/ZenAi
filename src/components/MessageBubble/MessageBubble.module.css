@@ -1,53 +1,209 @@
 .row {
-    display: flex;
-    width: 100%;
+  display: flex;
+  width: 100%;
 }
 
 .userRow {
-    justify-content: flex-end;
+  justify-content: flex-end;
 }
 
 .assistantRow {
-    justify-content: flex-start;
+  justify-content: flex-start;
 }
 
 .bubble {
-    max-width: min(720px, 82%);
-    padding: 14px 16px;
-    border-radius: 20px;
-    border: 1px solid transparent;
-    line-height: 1.5;
-    letter-spacing: 0.01em;
-    backdrop-filter: blur(8px);
-    text-align: left;
+  max-width: min(720px, 82%);
+  padding: 14px 16px;
+  border-radius: 20px;
+  border: 1px solid transparent;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  backdrop-filter: blur(8px);
+  text-align: left;
 }
 
 .userBubble {
-    background: var(--message-user-bg);
-    border-color: var(--message-user-border);
-    color: var(--message-user-text);
-    box-shadow: 0 0 14px var(--message-user-shadow);
+  background: var(--message-user-bg);
+  border-color: var(--message-user-border);
+  color: var(--message-user-text);
+  box-shadow: 0 0 14px var(--message-user-shadow);
 }
 
 .assistantBubble {
-    background: var(--message-assistant-bg);
-    border-color: var(--message-assistant-border);
-    color: var(--message-assistant-text);
+  background: var(--message-assistant-bg);
+  border-color: var(--message-assistant-border);
+  color: var(--message-assistant-text);
 }
 
 .meta {
-    margin-bottom: 8px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    opacity: 0.8;
-    text-align: left;
+  margin-bottom: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.8;
+  text-align: left;
 }
 
 .content {
-    margin: 0;
-    white-space: pre-wrap;
-    word-break: break-word;
-    text-align: left;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  text-align: left;
+}
+
+.markdownContent {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.markdownContent > * {
+  margin: 0;
+}
+
+.markdownParagraph {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.7;
+}
+
+.markdownList,
+.markdownOrderedList {
+  margin: 0;
+  padding-left: 1.4rem;
+  display: grid;
+  gap: 8px;
+}
+
+.markdownListItem {
+  line-height: 1.6;
+}
+
+.markdownLink {
+  color: var(--accent-strong);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.inlineCode {
+  padding: 0.15rem 0.45rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffd580;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.92em;
+}
+
+.codeBlock {
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  background: #141414;
+}
+
+.codeHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: #141414;
+}
+
+.codeLanguage {
+  color: #9fb3c8;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.codeCopyButton {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  background: transparent;
+  color: #dce9f5;
+  cursor: pointer;
+  font-size: 0.82rem;
+  padding: 6px 10px;
+}
+
+.codeCopyButton:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.preformatted {
+  margin: 0;
+  max-height: 280px;
+  overflow: auto;
+  white-space: pre;
+  background: #141414;
+}
+
+.codePre {
+  margin: 0;
+  padding: 16px;
+  min-width: max-content;
+  background: #141414;
+}
+
+.codeContent {
+  display: block;
+  background: transparent;
+  color: #dce9f5;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+.codeLine {
+  display: grid;
+  grid-template-columns: 3ch 1fr;
+  gap: 14px;
+}
+
+.codeLineNumber {
+  color: rgba(220, 233, 245, 0.4);
+  text-align: right;
+  user-select: none;
+  pointer-events: none;
+}
+
+.codeLineText {
+  white-space: pre;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.markdownTable {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 420px;
+}
+
+.markdownTableHead,
+.markdownTableCell {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 10px 12px;
+  text-align: left;
+}
+
+.markdownTableHead {
+  background: rgba(255, 255, 255, 0.05);
+  font-weight: 700;
+}
+
+.markdownBlockquote {
+  margin: 0;
+  padding: 12px 16px;
+  border-left: 3px solid var(--accent-strong);
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 0 12px 12px 0;
+  color: var(--text-secondary);
 }
