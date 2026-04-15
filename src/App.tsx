@@ -5,6 +5,7 @@ import { MessageBubble } from "@/components/MessageBubble"
 import type { Message } from "@/components/MessageBubble"
 import { SendButton } from "@/components/SendButton"
 import { sendChatMessage } from "@/services/chat/chatApi"
+import { useAuth } from "@/services/firebase/useAuth"
 import {
   buildConversationTitle,
   createConversation,
@@ -104,6 +105,7 @@ function createFaviconDataUrl(theme: "neon" | "sunset") {
 }
 
 function App() {
+  const { user, signIn, signOut } = useAuth()
   const [conversations, setConversations] = useState<ChatConversation[]>(() => {
     const storedConversations = loadConversations()
     return storedConversations.length > 0 ? storedConversations : [createConversation()]
@@ -129,8 +131,8 @@ function App() {
   )
 
   const isDisabled = useMemo(
-    () => inputValue.trim().length === 0 || isSending,
-    [inputValue, isSending]
+    () => !user || inputValue.trim().length === 0 || isSending,
+    [user, inputValue, isSending]
   )
 
   const sortedConversations = useMemo(
@@ -139,6 +141,11 @@ function App() {
   )
 
   const handleCreateConversation = () => {
+    if (!user) {
+      setRequestError("Necesitás iniciar sesión para crear y guardar chats.")
+      return
+    }
+
     const newConversation = createConversation()
 
     setConversations((prev) => [newConversation, ...prev])
@@ -149,6 +156,11 @@ function App() {
 
   const handleSend = async () => {
     if (!activeConversation) {
+      return
+    }
+
+    if (!user) {
+      setRequestError("Necesitás iniciar sesión para usar la IA.")
       return
     }
 
@@ -181,7 +193,8 @@ function App() {
     try {
       setIsSending(true)
 
-      const response = await sendChatMessage(nextMessages, activeConversation.id)
+      const idToken = await user.getIdToken()
+      const response = await sendChatMessage(nextMessages, activeConversation.id, idToken)
 
       const assistantMessage: Message = {
         id: Date.now() + 1,
@@ -282,6 +295,9 @@ function App() {
   return (
     <div>
       <Navbar
+        userLabel={user?.displayName ?? user?.email ?? null}
+        onSignIn={() => void signIn()}
+        onSignOut={() => void signOut()}
         isAltTheme={isAltTheme}
         onToggleTheme={() => setIsAltTheme((prev) => !prev)}
       />
@@ -299,6 +315,7 @@ function App() {
                 className="chatNewButton"
                 onClick={handleCreateConversation}
                 type="button"
+                disabled={!user}
               >
                 Nuevo chat
               </button>
@@ -369,11 +386,14 @@ function App() {
                 <textarea
                   id="chat-input"
                   className="composerInput"
-                  placeholder="Escribe aquí lo que quieres pedirle al asistente..."
+                  placeholder={user
+                    ? "Escribe aquí lo que quieres pedirle al asistente..."
+                    : "Iniciá sesión para usar el chat."
+                  }
                   value={inputValue}
                   onChange={(event) => setInputValue(event.target.value)}
                   onKeyDown={handleInputKeyDown}
-                  disabled={isSending}
+                  disabled={!user || isSending}
                   rows={1}
                 />
                 <SendButton

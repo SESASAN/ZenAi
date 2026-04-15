@@ -12,6 +12,9 @@ interface NavbarProps {
   links?: NavItem[]
   isAltTheme?: boolean
   onToggleTheme?: () => void
+  userLabel?: string | null
+  onSignIn?: () => void
+  onSignOut?: () => void
 }
 
 const defaultLinks: NavItem[] = [
@@ -26,7 +29,10 @@ export function Navbar({
   status = "online",
   links = defaultLinks,
   isAltTheme = false,
-  onToggleTheme
+  onToggleTheme,
+  userLabel = null,
+  onSignIn,
+  onSignOut
 }: NavbarProps) {
   return (
     <header className="navbar">
@@ -48,6 +54,31 @@ export function Navbar({
             </a>
           ))}
         </nav>
+
+        <div className="navbar__auth">
+          {userLabel ? (
+            <>
+              <span className="navbar__user" title={userLabel}>
+                {userLabel}
+              </span>
+              <button
+                className="navbar__authButton"
+                type="button"
+                onClick={onSignOut}
+              >
+                Salir
+              </button>
+            </>
+          ) : (
+            <button
+              className="navbar__authButton"
+              type="button"
+              onClick={onSignIn}
+            >
+              Ingresar
+            </button>
+          )}
+        </div>
 
         <img
           src={disc}

@@ -4,23 +4,23 @@ import { parseChatRequest } from "./chat/application/chat-request.validator.js";
 import { ChatService, type ChatLogRepository } from "./chat/application/chat.service.js";
 import { ChatValidationError, ProviderConfigurationError, ProviderRequestError } from "./chat/domain/chat.errors.js";
 import { createProviderRegistry, DEFAULT_PROVIDER } from "./chat/infrastructure/providers/provider-registry.js";
+import { getAuth } from "firebase-admin/auth";
+
+import "./shared/firebase/admin.js";
+import { FirestoreChatLogRepository } from "./chat/infrastructure/persistence/firestore-chat-log.repository.js";
 
 const port = Number(process.env.CHAT_BACKEND_PORT ?? 3001);
 
-class NoopChatLogRepository implements ChatLogRepository {
-  async saveExchange(): Promise<void> {
-    return;
-  }
-}
+const providerRegistry = createProviderRegistry({
+  groqApiKey: process.env.GROQ_API_KEY,
+  cerebrasApiKey: process.env.CEREBRAS_API_KEY,
+});
 
-const chatService = new ChatService(
-  createProviderRegistry({
-    groqApiKey: process.env.GROQ_API_KEY,
-    cerebrasApiKey: process.env.CEREBRAS_API_KEY,
-  }),
-  DEFAULT_PROVIDER,
-  new NoopChatLogRepository(),
-);
+function extractBearerToken(authorizationHeader: string | undefined) {
+  if (!authorizationHeader) return null;
+  const match = authorizationHeader.match(/^Bearer\s+(.+)$/i);
+  return match?.[1]?.trim() || null;
+}
 
 function setJsonHeaders(response: ServerResponse, statusCode = 200) {
   response.statusCode = statusCode;
@@ -72,8 +72,25 @@ const server = createServer(async (request, response) => {
   }
 
   try {
+    const token = extractBearerToken(request.headers.authorization);
+
+    if (!token) {
+      setJsonHeaders(response, 401);
+      response.end(JSON.stringify({ error: "Necesitás iniciar sesión para usar el chat." }));
+      return;
+    }
+
+    const decoded = await getAuth().verifyIdToken(token);
+
     const body = await readJsonBody(request);
     const chatRequest = parseChatRequest(body);
+
+    const chatService = new ChatService(
+      providerRegistry,
+      DEFAULT_PROVIDER,
+      new FirestoreChatLogRepository(decoded.uid) as ChatLogRepository,
+    );
+
     const completion = await chatService.execute(chatRequest);
 
     setJsonHeaders(response, 200);
@@ -100,6 +117,12 @@ const server = createServer(async (request, response) => {
     if (error instanceof ProviderRequestError) {
       setJsonHeaders(response, 502);
       response.end(JSON.stringify({ error: error.message }));
+      return;
+    }
+
+    if (error instanceof Error && error.name === "FirebaseAuthError") {
+      setJsonHeaders(response, 401);
+      response.end(JSON.stringify({ error: "Token inválido o expirado." }));
       return;
     }
 

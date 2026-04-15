@@ -52,6 +52,42 @@
   gap: 32px;
 }
 
+.navbar__auth {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+
+.navbar__user {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+.navbar__authButton {
+  border: 1px solid var(--line-soft);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-heading);
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.navbar__authButton:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.navbar__authButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .navbar__link {
   position: relative;
   font-size: 1rem;
@@ -95,6 +131,12 @@
   .navbar__nav {
     flex-wrap: wrap;
     gap: 18px;
+  }
+
+  .navbar__auth {
+    width: 100%;
+    justify-content: flex-end;
+    margin-left: 0;
   }
 }
 

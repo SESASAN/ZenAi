@@ -1,6 +1,7 @@
 import { defineSecret } from "firebase-functions/params";
 import { logger } from "firebase-functions";
 import { onRequest } from "firebase-functions/v2/https";
+import { getAuth } from "firebase-admin/auth";
 
 import { parseChatRequest } from "../../application/chat-request.validator.js";
 import { ChatService } from "../../application/chat.service.js";
@@ -19,6 +20,12 @@ function applyCorsHeaders(response: CorsResponse) {
   response.set("Access-Control-Allow-Origin", "*");
   response.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
   response.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+}
+
+function extractBearerToken(authorizationHeader: string | undefined) {
+  if (!authorizationHeader) return null;
+  const match = authorizationHeader.match(/^Bearer\s+(.+)$/i);
+  return match?.[1]?.trim() || null;
 }
 
 export const chat = onRequest(
@@ -42,6 +49,15 @@ export const chat = onRequest(
     }
 
     try {
+      const token = extractBearerToken(request.headers.authorization);
+
+      if (!token) {
+        response.status(401).json({ error: "Necesitás iniciar sesión para usar el chat." });
+        return;
+      }
+
+      const decoded = await getAuth().verifyIdToken(token);
+
       const chatRequest = parseChatRequest(request.body);
       const providerRegistry = createProviderRegistry({
         groqApiKey: GROQ_API_KEY.value(),
@@ -51,7 +67,7 @@ export const chat = onRequest(
       const chatService = new ChatService(
         providerRegistry,
         DEFAULT_PROVIDER,
-        new FirestoreChatLogRepository(),
+        new FirestoreChatLogRepository(decoded.uid),
       );
 
       const completion = await chatService.execute(chatRequest);
@@ -59,6 +75,11 @@ export const chat = onRequest(
       response.status(200).json(completion);
     } catch (error) {
       logger.error("chat handler failed", error);
+
+      if (error instanceof Error && error.name === "FirebaseAuthError") {
+        response.status(401).json({ error: "Token inválido o expirado." });
+        return;
+      }
 
       if (error instanceof ChatValidationError) {
         response.status(400).json({ error: error.message });

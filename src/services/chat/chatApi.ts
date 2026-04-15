@@ -30,7 +30,8 @@ function getChatApiBaseUrl() {
 
 export async function sendChatMessage(
   messages: Message[],
-  conversationId?: string
+  conversationId?: string,
+  idToken?: string
 ): Promise<ChatApiResponse> {
   const payload: ChatApiRequest = {
     provider: "groq",
@@ -44,7 +45,8 @@ export async function sendChatMessage(
     response = await fetch(`${getChatApiBaseUrl()}/chat`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        ...(idToken ? { Authorization: `Bearer ${idToken}` } : {})
       },
       body: JSON.stringify(payload)
     })
