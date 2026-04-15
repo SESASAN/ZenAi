@@ -1,4 +1,5 @@
 import type { ChatCompletion, ChatProvider, ChatRequest } from "../domain/chat.types.js";
+import { withSystemPrompt } from "./chat-system-prompt.js";
 
 export interface ChatLogRepository {
   saveExchange(input: {
@@ -25,6 +26,7 @@ export class ChatService {
 
     const response = await provider.generateReply({
       ...request,
+      messages: withSystemPrompt(request.messages),
       provider: providerName as ChatRequest["provider"],
     });
 

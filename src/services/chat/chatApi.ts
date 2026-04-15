@@ -17,7 +17,7 @@ type ChatApiResponse = {
   model: string
 }
 
-const DEFAULT_CHAT_API_URL = "http://localhost:3001"
+const DEFAULT_CHAT_API_URL = "http://127.0.0.1:3001"
 
 function getChatApiBaseUrl() {
   return import.meta.env.VITE_CHAT_API_URL?.trim() || DEFAULT_CHAT_API_URL
@@ -29,13 +29,21 @@ export async function sendChatMessage(messages: Message[]): Promise<ChatApiRespo
     messages: messages.map(({ role, content }) => ({ role, content }))
   }
 
-  const response = await fetch(`${getChatApiBaseUrl()}/chat`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(payload)
-  })
+  let response: Response
+
+  try {
+    response = await fetch(`${getChatApiBaseUrl()}/chat`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    })
+  } catch {
+    throw new Error(
+      "No se pudo conectar con el backend local. Asegurate de ejecutar `npm run dev:local` dentro de `functions/`."
+    )
+  }
 
   const data = (await response.json()) as ChatApiResponse | { error?: string }
 
