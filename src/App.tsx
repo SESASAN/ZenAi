@@ -105,15 +105,10 @@ function createFaviconDataUrl(theme: "neon" | "sunset") {
 }
 
 function App() {
-  const { user, signIn, signOut } = useAuth()
-  const [conversations, setConversations] = useState<ChatConversation[]>(() => {
-    const storedConversations = loadConversations()
-    return storedConversations.length > 0 ? storedConversations : [createConversation()]
-  })
-  const [activeConversationId, setActiveConversationId] = useState<string | null>(() => {
-    const storedConversations = loadConversations()
-    return storedConversations[0]?.id ?? null
-  })
+  const { user, isLoading: isAuthLoading, signIn, signOut } = useAuth()
+  const uid = user?.uid ?? null
+  const [conversations, setConversations] = useState<ChatConversation[]>([])
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(null)
   const [inputValue, setInputValue] = useState("")
   const [isSending, setIsSending] = useState(false)
   const [requestError, setRequestError] = useState<string | null>(null)
@@ -241,6 +236,30 @@ function App() {
   }
 
   useEffect(() => {
+    if (isAuthLoading) {
+      return
+    }
+
+    if (!uid) {
+      setConversations([])
+      setActiveConversationId(null)
+      setInputValue("")
+      setRequestError(null)
+      return
+    }
+
+    const storedConversations = loadConversations(uid)
+    const nextConversations = storedConversations.length > 0
+      ? storedConversations
+      : [createConversation()]
+
+    setConversations(nextConversations)
+    setActiveConversationId(nextConversations[0]?.id ?? null)
+    setInputValue("")
+    setRequestError(null)
+  }, [uid, isAuthLoading])
+
+  useEffect(() => {
     const messageListElement = messageListRef.current
 
     if (!messageListElement) {
@@ -254,8 +273,12 @@ function App() {
   }, [messages, isSending])
 
   useEffect(() => {
-    saveConversations(conversations)
-  }, [conversations])
+    if (!uid) {
+      return
+    }
+
+    saveConversations(uid, conversations)
+  }, [conversations, uid])
 
   useEffect(() => {
     if (!activeConversationId && conversations[0]) {

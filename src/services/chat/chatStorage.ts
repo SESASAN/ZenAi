@@ -8,7 +8,11 @@ export type ChatConversation = {
   updatedAt: number
 }
 
-const CHAT_STORAGE_KEY = "zenai-chat-conversations"
+const CHAT_STORAGE_KEY_BASE = "zenai-chat-conversations"
+
+function getChatStorageKey(uid: string) {
+  return `${CHAT_STORAGE_KEY_BASE}:${uid}`
+}
 
 function createConversationTitleFallback() {
   return "Nuevo chat"
@@ -38,8 +42,8 @@ export function buildConversationTitle(message: string) {
     : normalized
 }
 
-export function loadConversations(): ChatConversation[] {
-  const raw = window.localStorage.getItem(CHAT_STORAGE_KEY)
+export function loadConversations(uid: string): ChatConversation[] {
+  const raw = window.localStorage.getItem(getChatStorageKey(uid))
 
   if (!raw) {
     return []
@@ -54,6 +58,10 @@ export function loadConversations(): ChatConversation[] {
   }
 }
 
-export function saveConversations(conversations: ChatConversation[]) {
-  window.localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(conversations))
+export function saveConversations(uid: string, conversations: ChatConversation[]) {
+  window.localStorage.setItem(getChatStorageKey(uid), JSON.stringify(conversations))
+}
+
+export function clearConversations(uid: string) {
+  window.localStorage.removeItem(getChatStorageKey(uid))
 }
