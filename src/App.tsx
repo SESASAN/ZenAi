@@ -1,9 +1,10 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import "@/App.css"
 import { Navbar } from "@/components/Navbar"
 import { MessageBubble } from "@/components/MessageBubble"
 import type { Message } from "@/components/MessageBubble"
 import { SendButton } from "@/components/SendButton"
+import { sendChatMessage } from "@/services/chat/chatApi"
 
 const INITIAL_MESSAGES: Message[] = [
   {
@@ -27,10 +28,16 @@ const INITIAL_MESSAGES: Message[] = [
 function App() {
   const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES)
   const [inputValue, setInputValue] = useState("")
+  const [isSending, setIsSending] = useState(false)
+  const [requestError, setRequestError] = useState<string | null>(null)
+  const messageListRef = useRef<HTMLElement | null>(null)
 
-  const isDisabled = useMemo(() => inputValue.trim().length === 0, [inputValue])
+  const isDisabled = useMemo(
+    () => inputValue.trim().length === 0 || isSending,
+    [inputValue, isSending]
+  )
 
-  const handleSend = () => {
+  const handleSend = async () => {
     const trimmedValue = inputValue.trim()
 
     if (!trimmedValue) return
@@ -41,20 +48,63 @@ function App() {
       content: trimmedValue
     }
 
-    const assistantMessage: Message = {
-      id: Date.now() + 1,
-      role: "assistant",
-      content: `Recibí tu mensaje: "${trimmedValue}". El siguiente paso es convertir esta base en una conversación dinámica.`
+    const nextMessages = [...messages, userMessage]
+
+    setRequestError(null)
+    setMessages(nextMessages)
+    setInputValue("")
+
+    try {
+      setIsSending(true)
+
+      const response = await sendChatMessage(nextMessages)
+
+      const assistantMessage: Message = {
+        id: Date.now() + 1,
+        role: "assistant",
+        content: response.message.content
+      }
+
+      setMessages((prev) => [...prev, assistantMessage])
+    } catch (error) {
+      const message = error instanceof Error
+        ? error.message
+        : "No se pudo conectar con el backend del chat."
+
+      setRequestError(message)
+    } finally {
+      setIsSending(false)
+    }
+  }
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    await handleSend()
+  }
+
+  const handleInputKeyDown = async (
+    event: React.KeyboardEvent<HTMLTextAreaElement>
+  ) => {
+    if (event.key !== "Enter" || event.shiftKey) {
+      return
     }
 
-    setMessages((prev) => [...prev, userMessage, assistantMessage])
-    setInputValue("")
+    event.preventDefault()
+    await handleSend()
   }
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    handleSend()
-  }
+  useEffect(() => {
+    const messageListElement = messageListRef.current
+
+    if (!messageListElement) {
+      return
+    }
+
+    messageListElement.scrollTo({
+      top: messageListElement.scrollHeight,
+      behavior: "smooth"
+    })
+  }, [messages, isSending])
 
   return (
     <>
@@ -65,17 +115,27 @@ function App() {
           <header className="chatHeader">
             <div>
               <p className="chatEyebrow">Interfaz conversacional</p>
-              <h1 className="chatTitle">Vista previa del chat</h1>
+              <h1 className="chatTitle">Chat con ZenAI</h1>
             </div>
             <p className="chatSubtitle">
-              Construir interfaz de chat
+              Conversación conectada a un backend local con proveedores de IA.
             </p>
           </header>
 
-          <section className="messageList" aria-label="Lista de mensajes">
+          <section
+            ref={messageListRef}
+            className="messageList"
+            aria-label="Lista de mensajes"
+          >
             {messages.map((message) => (
               <MessageBubble key={message.id} message={message} />
             ))}
+
+            {isSending && (
+              <p className="chatStatus" role="status">
+                ZenAI está pensando...
+              </p>
+            )}
           </section>
 
           <form className="composer" onSubmit={handleSubmit}>
@@ -90,15 +150,22 @@ function App() {
                 placeholder="Escribe aquí lo que quieres pedirle al asistente..."
                 value={inputValue}
                 onChange={(event) => setInputValue(event.target.value)}
+                onKeyDown={handleInputKeyDown}
+                disabled={isSending}
                 rows={1}
               />
               <SendButton
-                label="Enviar"
-                onClick={handleSend}
+                label={isSending ? "Pensando..." : "Enviar"}
                 disabled={isDisabled}
                 type="submit"
               />
             </div>
+
+            {requestError && (
+              <p className="chatError" role="alert">
+                {requestError}
+              </p>
+            )}
           </form>
         </section>
       </main>

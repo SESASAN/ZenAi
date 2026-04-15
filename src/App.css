@@ -99,7 +99,18 @@ main {
   flex-direction: column;
   gap: 14px;
   min-height: 420px;
+  max-height: 60vh;
   margin-bottom: 24px;
+  overflow-y: auto;
+  padding-right: 6px;
+  scroll-behavior: smooth;
+}
+
+.chatStatus {
+  margin: 8px 0 0;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  text-align: center;
 }
 
 .composer {
@@ -139,6 +150,17 @@ main {
 .composerInput:focus {
   border-color: rgba(0, 229, 255, 0.35);
   box-shadow: 0 0 0 4px rgba(0, 229, 255, 0.06);
+}
+
+.composerInput:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.chatError {
+  margin: 14px 0 0;
+  color: #fca5a5;
+  font-size: 0.95rem;
 }
 
 @media (max-width: 900px) {
