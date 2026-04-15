@@ -19,6 +19,7 @@
     line-height: 1.5;
     letter-spacing: 0.01em;
     backdrop-filter: blur(8px);
+    text-align: left;
 }
 
 .userBubble {
@@ -41,10 +42,12 @@
     letter-spacing: 0.08em;
     text-transform: uppercase;
     opacity: 0.8;
+    text-align: left;
 }
 
 .content {
     margin: 0;
     white-space: pre-wrap;
     word-break: break-word;
+    text-align: left;
 }
