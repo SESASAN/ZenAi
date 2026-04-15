@@ -5,6 +5,13 @@ import { MessageBubble } from "@/components/MessageBubble"
 import type { Message } from "@/components/MessageBubble"
 import { SendButton } from "@/components/SendButton"
 import { sendChatMessage } from "@/services/chat/chatApi"
+import {
+  buildConversationTitle,
+  createConversation,
+  loadConversations,
+  saveConversations,
+  type ChatConversation
+} from "@/services/chat/chatStorage"
 
 const FAVICON_LINK_ID = "zenai-dynamic-favicon"
 
@@ -97,19 +104,54 @@ function createFaviconDataUrl(theme: "neon" | "sunset") {
 }
 
 function App() {
-  const [messages, setMessages] = useState<Message[]>([])
+  const [conversations, setConversations] = useState<ChatConversation[]>(() => {
+    const storedConversations = loadConversations()
+    return storedConversations.length > 0 ? storedConversations : [createConversation()]
+  })
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(() => {
+    const storedConversations = loadConversations()
+    return storedConversations[0]?.id ?? null
+  })
   const [inputValue, setInputValue] = useState("")
   const [isSending, setIsSending] = useState(false)
   const [requestError, setRequestError] = useState<string | null>(null)
   const [isAltTheme, setIsAltTheme] = useState(false)
   const messageListRef = useRef<HTMLElement | null>(null)
 
+  const activeConversation = useMemo(
+    () => conversations.find((conversation) => conversation.id === activeConversationId) ?? null,
+    [conversations, activeConversationId]
+  )
+
+  const messages = useMemo(
+    () => activeConversation?.messages ?? [],
+    [activeConversation]
+  )
+
   const isDisabled = useMemo(
     () => inputValue.trim().length === 0 || isSending,
     [inputValue, isSending]
   )
 
+  const sortedConversations = useMemo(
+    () => [...conversations].sort((a, b) => b.updatedAt - a.updatedAt),
+    [conversations]
+  )
+
+  const handleCreateConversation = () => {
+    const newConversation = createConversation()
+
+    setConversations((prev) => [newConversation, ...prev])
+    setActiveConversationId(newConversation.id)
+    setInputValue("")
+    setRequestError(null)
+  }
+
   const handleSend = async () => {
+    if (!activeConversation) {
+      return
+    }
+
     const trimmedValue = inputValue.trim()
 
     if (!trimmedValue) return
@@ -120,16 +162,26 @@ function App() {
       content: trimmedValue
     }
 
-    const nextMessages = [...messages, userMessage]
+    const nextMessages = [...activeConversation.messages, userMessage]
+    const updatedConversation: ChatConversation = {
+      ...activeConversation,
+      title: activeConversation.messages.length === 0
+        ? buildConversationTitle(trimmedValue)
+        : activeConversation.title,
+      messages: nextMessages,
+      updatedAt: Date.now()
+    }
 
     setRequestError(null)
-    setMessages(nextMessages)
+    setConversations((prev) => prev.map((conversation) => (
+      conversation.id === activeConversation.id ? updatedConversation : conversation
+    )))
     setInputValue("")
 
     try {
       setIsSending(true)
 
-      const response = await sendChatMessage(nextMessages)
+      const response = await sendChatMessage(nextMessages, activeConversation.id)
 
       const assistantMessage: Message = {
         id: Date.now() + 1,
@@ -137,7 +189,17 @@ function App() {
         content: response.message.content
       }
 
-      setMessages((prev) => [...prev, assistantMessage])
+      setConversations((prev) => prev.map((conversation) => {
+        if (conversation.id !== activeConversation.id) {
+          return conversation
+        }
+
+        return {
+          ...conversation,
+          messages: [...updatedConversation.messages, assistantMessage],
+          updatedAt: Date.now()
+        }
+      }))
     } catch (error) {
       const message = error instanceof Error
         ? error.message
@@ -179,6 +241,21 @@ function App() {
   }, [messages, isSending])
 
   useEffect(() => {
+    saveConversations(conversations)
+  }, [conversations])
+
+  useEffect(() => {
+    if (!activeConversationId && conversations[0]) {
+      setActiveConversationId(conversations[0].id)
+      return
+    }
+
+    if (activeConversationId && !conversations.some((conversation) => conversation.id === activeConversationId)) {
+      setActiveConversationId(conversations[0]?.id ?? null)
+    }
+  }, [conversations, activeConversationId])
+
+  useEffect(() => {
     const theme = isAltTheme ? "sunset" : "neon"
 
     document.documentElement.setAttribute("data-theme", theme)
@@ -210,59 +287,109 @@ function App() {
       />
 
       <main className="appMain">
-        <section className="chatShell">
-          <header className="chatHeader">
-            <div>
-              <p className="chatEyebrow">Interfaz conversacional</p>
-              <h1 className="chatTitle">Chat con ZenAI</h1>
+        <section className="chatLayout">
+          <aside className="chatSidebar">
+            <div className="chatSidebarHeader">
+              <div>
+                <p className="chatEyebrow">Conversaciones</p>
+                <h2 className="chatSidebarTitle">Tus chats</h2>
+              </div>
+
+              <button
+                className="chatNewButton"
+                onClick={handleCreateConversation}
+                type="button"
+              >
+                Nuevo chat
+              </button>
             </div>
-          </header>
 
-          <section
-            ref={messageListRef}
-            className="messageList"
-            aria-label="Lista de mensajes"
-          >
-            {messages.map((message) => (
-              <MessageBubble key={message.id} message={message} />
-            ))}
+            <div className="chatConversationList" aria-label="Lista de conversaciones">
+              {sortedConversations.map((conversation) => {
+                const isActive = conversation.id === activeConversationId
+                const lastMessage = conversation.messages.at(-1)?.content ?? "Sin mensajes todavía"
 
-            {isSending && (
-              <p className="chatStatus" role="status">
-                ZenAI está pensando...
-              </p>
-            )}
+                return (
+                  <button
+                    key={conversation.id}
+                    className={`chatConversationItem ${isActive ? "chatConversationItem--active" : ""}`}
+                    onClick={() => {
+                      setActiveConversationId(conversation.id)
+                      setRequestError(null)
+                    }}
+                    type="button"
+                  >
+                    <span className="chatConversationTitle">{conversation.title}</span>
+                    <span className="chatConversationPreview">{lastMessage}</span>
+                  </button>
+                )
+              })}
+            </div>
+          </aside>
+
+          <section className="chatShell">
+            <header className="chatHeader">
+              <div>
+                <p className="chatEyebrow">Interfaz conversacional</p>
+                <h1 className="chatTitle">Chat con ZenAI</h1>
+              </div>
+            </header>
+
+            <section
+              ref={messageListRef}
+              className="messageList"
+              aria-label="Lista de mensajes"
+            >
+              {messages.map((message) => (
+                <MessageBubble key={message.id} message={message} />
+              ))}
+
+              {messages.length === 0 && !isSending && (
+                <div className="chatEmptyState">
+                  <p className="chatEmptyTitle">Este chat está vacío</p>
+                  <p className="chatEmptyDescription">
+                    Empezá la conversación con una idea, una pregunta o una tarea para ZenAI.
+                  </p>
+                </div>
+              )}
+
+              {isSending && (
+                <p className="chatStatus" role="status">
+                  ZenAI está pensando...
+                </p>
+              )}
+            </section>
+
+            <form className="composer" onSubmit={handleSubmit}>
+              <label className="composerLabel" htmlFor="chat-input">
+                Escribe un mensaje
+              </label>
+
+              <div className="composerRow">
+                <textarea
+                  id="chat-input"
+                  className="composerInput"
+                  placeholder="Escribe aquí lo que quieres pedirle al asistente..."
+                  value={inputValue}
+                  onChange={(event) => setInputValue(event.target.value)}
+                  onKeyDown={handleInputKeyDown}
+                  disabled={isSending}
+                  rows={1}
+                />
+                <SendButton
+                  label={isSending ? "Pensando..." : "Enviar"}
+                  disabled={isDisabled}
+                  type="submit"
+                />
+              </div>
+
+              {requestError && (
+                <p className="chatError" role="alert">
+                  {requestError}
+                </p>
+              )}
+            </form>
           </section>
-
-          <form className="composer" onSubmit={handleSubmit}>
-            <label className="composerLabel" htmlFor="chat-input">
-              Escribe un mensaje
-            </label>
-
-            <div className="composerRow">
-              <textarea
-                id="chat-input"
-                className="composerInput"
-                placeholder="Escribe aquí lo que quieres pedirle al asistente..."
-                value={inputValue}
-                onChange={(event) => setInputValue(event.target.value)}
-                onKeyDown={handleInputKeyDown}
-                disabled={isSending}
-                rows={1}
-              />
-              <SendButton
-                label={isSending ? "Pensando..." : "Enviar"}
-                disabled={isDisabled}
-                type="submit"
-              />
-            </div>
-
-            {requestError && (
-              <p className="chatError" role="alert">
-                {requestError}
-              </p>
-            )}
-          </form>
         </section>
       </main>
     </div>

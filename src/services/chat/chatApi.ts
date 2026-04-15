@@ -2,6 +2,7 @@ import type { Message } from "@/components/MessageBubble"
 
 type ChatApiRequest = {
   provider?: "groq" | "cerebras"
+  conversationId?: string
   messages: Array<{
     role: "user" | "assistant"
     content: string
@@ -17,15 +18,23 @@ type ChatApiResponse = {
   model: string
 }
 
+type ChatApiError = {
+  error?: string
+}
+
 const DEFAULT_CHAT_API_URL = "http://127.0.0.1:3001"
 
 function getChatApiBaseUrl() {
   return import.meta.env.VITE_CHAT_API_URL?.trim() || DEFAULT_CHAT_API_URL
 }
 
-export async function sendChatMessage(messages: Message[]): Promise<ChatApiResponse> {
+export async function sendChatMessage(
+  messages: Message[],
+  conversationId?: string
+): Promise<ChatApiResponse> {
   const payload: ChatApiRequest = {
     provider: "groq",
+    conversationId,
     messages: messages.map(({ role, content }) => ({ role, content }))
   }
 
@@ -45,10 +54,11 @@ export async function sendChatMessage(messages: Message[]): Promise<ChatApiRespo
     )
   }
 
-  const data = (await response.json()) as ChatApiResponse | { error?: string }
+  const data = (await response.json()) as ChatApiResponse | ChatApiError
 
   if (!response.ok) {
-    throw new Error(data.error || "No se pudo obtener respuesta del asistente.")
+    const errorMessage = "error" in data ? data.error : undefined
+    throw new Error(errorMessage || "No se pudo obtener respuesta del asistente.")
   }
 
   return data as ChatApiResponse
