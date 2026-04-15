@@ -6,27 +6,8 @@ import type { Message } from "@/components/MessageBubble"
 import { SendButton } from "@/components/SendButton"
 import { sendChatMessage } from "@/services/chat/chatApi"
 
-const INITIAL_MESSAGES: Message[] = [
-  {
-    id: 1,
-    role: "assistant",
-    content: "Hola. Soy ZenAI. Estoy listo para ayudarte con tu proyecto."
-  },
-  {
-    id: 2,
-    role: "user",
-    content: "Quiero construir una interfaz de chat elegante y bien organizada."
-  },
-  {
-    id: 3,
-    role: "assistant",
-    content:
-      "Perfecto. Podemos empezar por una estructura clara de componentes y una base visual consistente."
-  }
-]
-
 function App() {
-  const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES)
+  const [messages, setMessages] = useState<Message[]>([])
   const [inputValue, setInputValue] = useState("")
   const [isSending, setIsSending] = useState(false)
   const [requestError, setRequestError] = useState<string | null>(null)
