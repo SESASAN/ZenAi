@@ -31,23 +31,23 @@
 }
 
 .primary {
-    background: linear-gradient(180deg, #0dd6f7 0%, #07b9d7 100%);
-    color: #031018;
-    box-shadow: 0 0 12px rgba(0, 229, 255, 0.18);
+    background: var(--button-primary-bg);
+    color: var(--button-primary-text);
+    box-shadow: 0 0 12px var(--button-primary-shadow);
 }
 
 .primary:hover {
-    box-shadow: 0 0 18px rgba(0, 229, 255, 0.26);
+    box-shadow: 0 0 18px var(--button-primary-shadow-hover);
 }
 
 .secondary {
-    background: rgba(15, 23, 42, 0.88);
-    color: #dff8ff;
-    border-color: rgba(0, 229, 255, 0.22);
+    background: var(--button-secondary-bg);
+    color: var(--button-secondary-text);
+    border-color: var(--button-secondary-border);
 }
 
 .secondary:hover {
-    border-color: rgba(0, 229, 255, 0.38);
+    border-color: var(--button-secondary-border-hover);
 }
 
 .pressed {

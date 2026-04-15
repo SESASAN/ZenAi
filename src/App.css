@@ -2,13 +2,73 @@
   --bg-primary: #0a0f1f;
   --bg-secondary: #111827;
   --neon-primary: #00e5ff;
+  --accent-strong: #00e5ff;
+  --accent-soft: rgba(0, 229, 255, 0.12);
+  --accent-medium: rgba(0, 229, 255, 0.2);
+  --accent-focus: rgba(0, 229, 255, 0.35);
+  --accent-glow: rgba(0, 229, 255, 0.06);
+  --bg-top-glow: rgba(0, 229, 255, 0.08);
   --text-primary: #e0f7ff;
   --text-secondary: #94a3b8;
+  --text-heading: #f2f7fb;
+  --text-muted: #d7e4ef;
   --success: #00ff9c;
   --surface-primary: rgba(8, 15, 28, 0.82);
   --surface-secondary: rgba(15, 23, 42, 0.86);
   --line-soft: rgba(0, 229, 255, 0.12);
   --line-strong: rgba(0, 229, 255, 0.2);
+  --message-user-bg: linear-gradient(180deg, rgba(0, 229, 255, 0.18), rgba(0, 175, 220, 0.12));
+  --message-user-border: rgba(0, 229, 255, 0.25);
+  --message-user-text: #effcff;
+  --message-user-shadow: rgba(0, 229, 255, 0.08);
+  --message-assistant-bg: rgba(15, 23, 42, 0.88);
+  --message-assistant-border: rgba(148, 163, 184, 0.18);
+  --message-assistant-text: #dce9f5;
+  --button-primary-bg: linear-gradient(180deg, #0dd6f7 0%, #07b9d7 100%);
+  --button-primary-text: #031018;
+  --button-primary-shadow: rgba(0, 229, 255, 0.18);
+  --button-primary-shadow-hover: rgba(0, 229, 255, 0.26);
+  --button-secondary-bg: rgba(15, 23, 42, 0.88);
+  --button-secondary-text: #dff8ff;
+  --button-secondary-border: rgba(0, 229, 255, 0.22);
+  --button-secondary-border-hover: rgba(0, 229, 255, 0.38);
+  --error-color: #fca5a5;
+}
+
+[data-theme="sunset"] {
+  --bg-primary: #1f120a;
+  --bg-secondary: #2a160f;
+  --neon-primary: #ff9b42;
+  --accent-strong: #ff8c00;
+  --accent-soft: rgba(255, 140, 0, 0.14);
+  --accent-medium: rgba(255, 140, 0, 0.24);
+  --accent-focus: rgba(255, 140, 0, 0.4);
+  --accent-glow: rgba(255, 140, 0, 0.08);
+  --bg-top-glow: rgba(255, 140, 0, 0.12);
+  --text-primary: #fff1e6;
+  --text-secondary: #d2ab90;
+  --text-heading: #fff8f2;
+  --text-muted: #f0d7c5;
+  --surface-primary: rgba(30, 16, 10, 0.84);
+  --surface-secondary: rgba(52, 28, 18, 0.9);
+  --line-soft: rgba(255, 140, 0, 0.16);
+  --line-strong: rgba(255, 140, 0, 0.28);
+  --message-user-bg: linear-gradient(180deg, rgba(255, 140, 0, 0.22), rgba(255, 94, 0, 0.14));
+  --message-user-border: rgba(255, 140, 0, 0.35);
+  --message-user-text: #fff5eb;
+  --message-user-shadow: rgba(255, 140, 0, 0.14);
+  --message-assistant-bg: rgba(57, 31, 20, 0.9);
+  --message-assistant-border: rgba(255, 189, 143, 0.22);
+  --message-assistant-text: #ffe8d6;
+  --button-primary-bg: linear-gradient(180deg, #ffb347 0%, #ff8c00 100%);
+  --button-primary-text: #2a160f;
+  --button-primary-shadow: rgba(255, 140, 0, 0.22);
+  --button-primary-shadow-hover: rgba(255, 140, 0, 0.32);
+  --button-secondary-bg: rgba(57, 31, 20, 0.9);
+  --button-secondary-text: #fff2e6;
+  --button-secondary-border: rgba(255, 140, 0, 0.24);
+  --button-secondary-border-hover: rgba(255, 140, 0, 0.4);
+  --error-color: #ffd3b6;
 }
 
 * {
@@ -25,11 +85,12 @@ body,
 
 body {
   background:
-    radial-gradient(circle at top, rgba(0, 229, 255, 0.08), transparent 35%),
-    linear-gradient(180deg, #020817 0%, #071224 100%);
+    radial-gradient(circle at top, var(--bg-top-glow), transparent 35%),
+    linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
   color: var(--text-primary);
   font-family: Inter, Arial, sans-serif;
-} 
+  transition: background 0.28s ease, color 0.28s ease;
+}
 
 a {
   text-decoration: none;
@@ -53,7 +114,7 @@ main {
   border: 1px solid var(--line-soft);
   border-radius: 28px;
   background:
-    linear-gradient(180deg, rgba(9, 15, 28, 0.94), rgba(5, 10, 20, 0.92));
+    linear-gradient(180deg, var(--surface-primary), var(--surface-secondary));
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.02),
     0 20px 60px rgba(0, 0, 0, 0.35);
@@ -148,8 +209,8 @@ main {
 }
 
 .composerInput:focus {
-  border-color: rgba(0, 229, 255, 0.35);
-  box-shadow: 0 0 0 4px rgba(0, 229, 255, 0.06);
+  border-color: var(--accent-focus);
+  box-shadow: 0 0 0 4px var(--accent-glow);
 }
 
 .composerInput:disabled {
@@ -159,7 +220,7 @@ main {
 
 .chatError {
   margin: 14px 0 0;
-  color: #fca5a5;
+  color: var(--error-color);
   font-size: 0.95rem;
 }
 

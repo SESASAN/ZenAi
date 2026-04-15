@@ -1,6 +1,5 @@
 import "../styles/navbar.css"
 import disc from "../assets/disc.svg"
-import { useState } from "react"
 
 interface NavItem {
   label: string
@@ -11,6 +10,8 @@ interface NavbarProps {
   brand?: string
   status?: "online" | "offline"
   links?: NavItem[]
+  isAltTheme?: boolean
+  onToggleTheme?: () => void
 }
 
 const defaultLinks: NavItem[] = [
@@ -23,11 +24,10 @@ const defaultLinks: NavItem[] = [
 export function Navbar({
   brand = "ZenAI",
   status = "online",
-  links = defaultLinks
+  links = defaultLinks,
+  isAltTheme = false,
+  onToggleTheme
 }: NavbarProps) {
-
-  const [Mode, setMode] = useState(false)
-
   return (
     <header className="navbar">
       <div className="navbar__container">
@@ -51,9 +51,11 @@ export function Navbar({
 
         <img
           src={disc}
-          className={`navbar__disc ${Mode ? "navbar__disc--t" : ""}`}
-          onClick={() => setMode(!Mode)}
+          className={`navbar__disc ${isAltTheme ? "navbar__disc--t" : ""}`}
+          onClick={onToggleTheme}
           alt="Disc"
+          role="button"
+          aria-label="Cambiar tema de la aplicación"
         />
 
       </div>

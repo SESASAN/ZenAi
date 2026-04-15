@@ -30,6 +30,7 @@ function App() {
   const [inputValue, setInputValue] = useState("")
   const [isSending, setIsSending] = useState(false)
   const [requestError, setRequestError] = useState<string | null>(null)
+  const [isAltTheme, setIsAltTheme] = useState(false)
   const messageListRef = useRef<HTMLElement | null>(null)
 
   const isDisabled = useMemo(
@@ -106,9 +107,24 @@ function App() {
     })
   }, [messages, isSending])
 
+  useEffect(() => {
+    const theme = isAltTheme ? "sunset" : "neon"
+
+    document.documentElement.setAttribute("data-theme", theme)
+    document.body.setAttribute("data-theme", theme)
+
+    return () => {
+      document.documentElement.removeAttribute("data-theme")
+      document.body.removeAttribute("data-theme")
+    }
+  }, [isAltTheme])
+
   return (
-    <>
-      <Navbar />
+    <div>
+      <Navbar
+        isAltTheme={isAltTheme}
+        onToggleTheme={() => setIsAltTheme((prev) => !prev)}
+      />
 
       <main className="appMain">
         <section className="chatShell">
@@ -169,7 +185,7 @@ function App() {
           </form>
         </section>
       </main>
-    </>
+    </div>
   )
 }
 

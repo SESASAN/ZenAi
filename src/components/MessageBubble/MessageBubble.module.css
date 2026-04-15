@@ -22,16 +22,16 @@
 }
 
 .userBubble {
-    background: linear-gradient(180deg, rgba(0, 229, 255, 0.18), rgba(0, 175, 220, 0.12));
-    border-color: rgba(0, 229, 255, 0.25);
-    color: #effcff;
-    box-shadow: 0 0 14px rgba(0, 229, 255, 0.08);
+    background: var(--message-user-bg);
+    border-color: var(--message-user-border);
+    color: var(--message-user-text);
+    box-shadow: 0 0 14px var(--message-user-shadow);
 }
 
 .assistantBubble {
-    background: rgba(15, 23, 42, 0.88);
-    border-color: rgba(148, 163, 184, 0.18);
-    color: #dce9f5;
+    background: var(--message-assistant-bg);
+    border-color: var(--message-assistant-border);
+    color: var(--message-assistant-text);
 }
 
 .meta {
