@@ -5,6 +5,7 @@ interface SideNavProps {
   activeConversationId: string | null
   isOpen: boolean
   userLabel?: string | null
+  userAvatarUrl?: string | null
   canCreateConversation: boolean
   onClose: () => void
   onCreateConversation: () => void
@@ -24,6 +25,7 @@ export function SideNav({
   activeConversationId,
   isOpen,
   userLabel,
+  userAvatarUrl,
   canCreateConversation,
   onClose,
   onCreateConversation,
@@ -31,6 +33,9 @@ export function SideNav({
   onSignIn,
   onSignOut
 }: SideNavProps) {
+  const initial = (userLabel ?? "Z").slice(0, 1).toUpperCase()
+  const showAvatar = Boolean(userAvatarUrl)
+
   return (
     <>
       <div
@@ -107,7 +112,17 @@ export function SideNav({
         <div className="sideNav__footer">
           <div className="sideNav__profile">
             <div className="sideNav__avatar" aria-hidden="true">
-              {(userLabel ?? "Z").slice(0, 1).toUpperCase()}
+              {showAvatar ? (
+                <img
+                  className="sideNav__avatarImage"
+                  src={userAvatarUrl ?? ""}
+                  alt=""
+                  loading="lazy"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                initial
+              )}
             </div>
 
             <div className="sideNav__profileCopy">

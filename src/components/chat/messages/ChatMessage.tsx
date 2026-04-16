@@ -16,15 +16,16 @@ function isUserMessage(message: Message): message is UserMessageModel {
 interface ChatMessageProps {
   message: Message
   userInitial?: string
+  userAvatarUrl?: string | null
 }
 
-export function ChatMessage({ message, userInitial }: ChatMessageProps) {
+export function ChatMessage({ message, userInitial, userAvatarUrl }: ChatMessageProps) {
   if (isAssistantMessage(message)) {
     return <AssistantMessage message={message} />
   }
 
   if (isUserMessage(message)) {
-    return <UserMessage message={message} userInitial={userInitial} />
+    return <UserMessage message={message} userInitial={userInitial} userAvatarUrl={userAvatarUrl} />
   }
 
   return null

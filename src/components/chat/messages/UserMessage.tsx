@@ -1,3 +1,4 @@
+import { useState } from "react"
 import type { Message } from "@/components/MessageBubble"
 import { ROLE_LABELS } from "@/components/MessageBubble/MessageBubble.constants"
 import styles from "@/components/chat/messages/ChatMessage.module.css"
@@ -7,9 +8,14 @@ type UserMessageModel = Message & { role: "user" }
 interface UserMessageProps {
   message: UserMessageModel
   userInitial?: string
+  userAvatarUrl?: string | null
 }
 
-export function UserMessage({ message, userInitial }: UserMessageProps) {
+export function UserMessage({ message, userInitial, userAvatarUrl }: UserMessageProps) {
+  const [isImageValid, setIsImageValid] = useState(true)
+  const initial = (userInitial ?? "U").slice(0, 1).toUpperCase()
+  const showImage = Boolean(userAvatarUrl) && isImageValid
+
   return (
     <div className={`${styles.row} ${styles.userRow}`}>
       <div className={`${styles.body} ${styles.userBody}`}>
@@ -21,7 +27,18 @@ export function UserMessage({ message, userInitial }: UserMessageProps) {
       </div>
 
       <div className={`${styles.avatar} ${styles.userAvatar}`} aria-hidden="true">
-        <span className={styles.avatarIcon}>{(userInitial ?? "U").slice(0, 1).toUpperCase()}</span>
+        {showImage ? (
+          <img
+            className={styles.avatarImage}
+            src={userAvatarUrl ?? ""}
+            alt=""
+            loading="lazy"
+            referrerPolicy="no-referrer"
+            onError={() => setIsImageValid(false)}
+          />
+        ) : (
+          <span className={styles.avatarIcon}>{initial}</span>
+        )}
       </div>
     </div>
   )

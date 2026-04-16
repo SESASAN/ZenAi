@@ -110,6 +110,7 @@ function App() {
   const { user, isLoading: isAuthLoading, signIn, signOut } = useAuth()
   const uid = user?.uid ?? null
   const userInitial = (user?.displayName ?? user?.email ?? "U").trim().slice(0, 1).toUpperCase()
+  const userAvatarUrl = user?.photoURL ?? null
   const [conversations, setConversations] = useState<ChatConversation[]>([])
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null)
   const [inputValue, setInputValue] = useState("")
@@ -395,6 +396,7 @@ function App() {
           activeConversationId={activeConversationId}
           isOpen={isSidebarOpen}
           userLabel={user?.displayName ?? user?.email ?? null}
+          userAvatarUrl={userAvatarUrl}
           canCreateConversation={Boolean(user)}
           onClose={() => setIsSidebarOpen(false)}
           onCreateConversation={handleCreateConversation}
@@ -423,6 +425,7 @@ function App() {
               messages={messages}
               isSending={isSending}
               userInitial={userInitial}
+              userAvatarUrl={userAvatarUrl}
             />
           </section>
         </section>

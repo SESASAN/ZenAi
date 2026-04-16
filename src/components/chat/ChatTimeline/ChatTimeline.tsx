@@ -12,6 +12,7 @@ export interface ChatTimelineProps {
   isSending: boolean
   emptyStateCopy?: EmptyStateCopy
   userInitial?: string
+  userAvatarUrl?: string | null
 }
 
 const DEFAULT_EMPTY_STATE: EmptyStateCopy = {
@@ -24,7 +25,8 @@ export const ChatTimeline = forwardRef<HTMLElement, ChatTimelineProps>(function 
     messages,
     isSending,
     emptyStateCopy = DEFAULT_EMPTY_STATE,
-    userInitial
+    userInitial,
+    userAvatarUrl
   },
   ref
 ) {
@@ -36,7 +38,12 @@ export const ChatTimeline = forwardRef<HTMLElement, ChatTimelineProps>(function 
     >
       <div className="messageList__inner">
         {messages.map((message) => (
-          <ChatMessage key={message.id} message={message} userInitial={userInitial} />
+          <ChatMessage
+            key={message.id}
+            message={message}
+            userInitial={userInitial}
+            userAvatarUrl={userAvatarUrl}
+          />
         ))}
 
         {messages.length === 0 && !isSending && (
