@@ -30,21 +30,6 @@
   text-shadow: 0 0 8px var(--accent-medium);
 }
 
-.navbar__status {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.95rem;
-  color: var(--text-secondary);
-}
-
-.navbar__status-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--accent-strong);
-  box-shadow: 0 0 8px var(--accent-medium);
-}
 
 .navbar__nav {
   display: flex;

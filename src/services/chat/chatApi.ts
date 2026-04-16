@@ -51,9 +51,7 @@ export async function sendChatMessage(
       body: JSON.stringify(payload)
     })
   } catch {
-    throw new Error(
-      "No se pudo conectar con el backend local. Asegurate de ejecutar `npm run dev:local` dentro de `functions/`."
-    )
+    throw new Error("Conexión Perdida")
   }
 
   const data = (await response.json()) as ChatApiResponse | ChatApiError

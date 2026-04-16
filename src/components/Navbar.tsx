@@ -8,7 +8,6 @@ interface NavItem {
 
 interface NavbarProps {
   brand?: string
-  status?: "online" | "offline"
   links?: NavItem[]
   isAltTheme?: boolean
   onToggleTheme?: () => void
@@ -26,7 +25,6 @@ const defaultLinks: NavItem[] = [
 
 export function Navbar({
   brand = "ZenAI",
-  status = "online",
   links = defaultLinks,
   isAltTheme = false,
   onToggleTheme,
@@ -40,11 +38,6 @@ export function Navbar({
 
         <div className="navbar__brand">
           <span className="navbar__logo">{brand}</span>
-
-          <div className="navbar__status">
-            <span className="navbar__status-dot" />
-            {status === "online" ? "Online" : "Offline"}
-          </div>
         </div>
 
         <nav className="navbar__nav">
