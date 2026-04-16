@@ -352,13 +352,6 @@ function App() {
       <div className="appMain">
         <section className="chatLayout">
           <section className="chatShell">
-            <header className="chatHeader">
-              <div>
-                <p className="chatEyebrow">Interfaz conversacional</p>
-                <h2 className="chatTitle">Chat con ZenAI</h2>
-              </div>
-            </header>
-
             <section
               ref={messageListRef}
               className="messageList"

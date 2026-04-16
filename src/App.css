@@ -133,11 +133,18 @@ a {
 .appShell__main {
   min-width: 0;
   padding-left: 18rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .appMain {
   width: 100%;
   padding: 0 24px 56px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .sessionHeader {
@@ -460,56 +467,37 @@ a {
 }
 
 .chatLayout {
-  max-width: 1100px;
-  margin: 0 auto;
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .chatShell {
   width: 100%;
   min-width: 0;
-  padding: 28px;
-  border: 1px solid var(--line-soft);
-  border-radius: 28px;
-  background: linear-gradient(180deg, var(--surface-primary), var(--surface-secondary));
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.02),
-    0 20px 60px rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(12px);
-}
-
-.chatHeader {
+  flex: 1;
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 28px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--line-soft);
-}
-
-.chatEyebrow {
-  margin: 0 0 8px;
-  color: var(--neon-primary);
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  opacity: 0.9;
-}
-
-.chatTitle {
-  margin: 0;
-  font-size: clamp(1.8rem, 3vw, 2.6rem);
-  line-height: 1.05;
+  flex-direction: column;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
 }
 
 .messageList {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  min-height: 420px;
-  max-height: 60vh;
-  margin-bottom: 24px;
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+  padding-top: 8px;
+  margin-bottom: 0;
   overflow-y: auto;
   padding-right: 6px;
   scroll-behavior: smooth;
@@ -552,6 +540,7 @@ a {
 }
 
 .composer {
+  margin-top: 18px;
   padding-top: 20px;
   border-top: 1px solid var(--line-soft);
 }
@@ -652,19 +641,8 @@ a {
     gap: 10px;
   }
 
-  .chatShell {
-    padding: 20px;
-    border-radius: 24px;
-  }
-
-  .chatHeader {
-    margin-bottom: 20px;
-    padding-bottom: 16px;
-  }
-
   .messageList {
-    min-height: 320px;
-    max-height: none;
+    padding-top: 4px;
   }
 
   .composerRow {
