@@ -1,6 +1,7 @@
 import { FieldValue } from "firebase-admin/firestore";
 
-import { adminAuth, adminDb } from "./_shared/firebaseAdmin";
+// En runtime ESM (Vercel) las imports relativas necesitan extensión.
+import { adminAuth, adminDb } from "./_shared/firebaseAdmin.js";
 
 type RequestLike = {
   method?: string;
