@@ -1,0 +1,152 @@
+.row {
+  display: flex;
+  width: 100%;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.assistantRow {
+  justify-content: flex-start;
+  padding-right: 162px;
+}
+
+.userRow {
+  justify-content: flex-end;
+  padding-left: 162px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border: 1px solid color-mix(in srgb, var(--line-soft) 70%, transparent);
+  background: color-mix(in srgb, rgba(255, 255, 255, 0.06) 60%, transparent);
+  color: var(--text-heading);
+}
+
+.assistantAvatar {
+  border-radius: 14px;
+}
+
+.userAvatar {
+  border-radius: 999px;
+}
+
+.avatarIcon {
+  font-size: 18px;
+  line-height: 1;
+  font-weight: 800;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.assistantBody {
+  align-items: flex-start;
+}
+
+.userBody {
+  align-items: flex-end;
+}
+
+.bubble {
+  max-width: min(660px, 78vw);
+  padding: 14px 16px;
+  border-radius: 20px;
+  border: 1px solid transparent;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  backdrop-filter: blur(8px);
+  text-align: left;
+}
+
+.assistantBubble {
+  background: var(--message-assistant-bg);
+  border-color: var(--message-assistant-border);
+  color: var(--message-assistant-text);
+  border-top-left-radius: 8px;
+}
+
+.userBubble {
+  background: var(--message-user-bg);
+  border-color: var(--message-user-border);
+  color: var(--message-user-text);
+  box-shadow: 0 0 14px var(--message-user-shadow);
+  border-top-right-radius: 8px;
+}
+
+.meta {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--text-secondary) 82%, transparent);
+}
+
+.userText {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.bento {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.bentoCard {
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--line-soft) 55%, transparent);
+  background: color-mix(in srgb, rgba(0, 0, 0, 0.18) 70%, transparent);
+}
+
+.bentoTitle {
+  margin: 0 0 6px;
+  font-size: 0.85rem;
+  letter-spacing: 0.01em;
+  color: color-mix(in srgb, var(--accent-strong) 70%, var(--text-heading));
+}
+
+.bentoText {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--text-secondary) 88%, var(--text-primary));
+}
+
+@media (max-width: 768px) {
+  .row {
+    gap: 12px;
+  }
+
+  .avatar {
+    width: 36px;
+    height: 36px;
+  }
+
+  .bubble {
+    max-width: 100%;
+  }
+
+  .assistantRow {
+    padding-right: 0;
+  }
+
+  .userRow {
+    padding-left: 0;
+  }
+
+  .bento {
+    grid-template-columns: 1fr;
+  }
+}

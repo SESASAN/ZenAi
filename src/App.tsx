@@ -109,6 +109,7 @@ function createFaviconDataUrl(theme: "neon" | "sunset") {
 function App() {
   const { user, isLoading: isAuthLoading, signIn, signOut } = useAuth()
   const uid = user?.uid ?? null
+  const userInitial = (user?.displayName ?? user?.email ?? "U").trim().slice(0, 1).toUpperCase()
   const [conversations, setConversations] = useState<ChatConversation[]>([])
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null)
   const [inputValue, setInputValue] = useState("")
@@ -390,6 +391,7 @@ function App() {
               ref={messageListRef}
               messages={messages}
               isSending={isSending}
+              userInitial={userInitial}
             />
           </section>
         </section>
