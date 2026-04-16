@@ -157,6 +157,47 @@ El backend local queda disponible en:
 http://localhost:3001
 ```
 
+## Deploy del backend en Vercel (gratis)
+
+Si no querés usar Firebase Functions (por límites/costos de deploy), podés desplegar el backend como **Serverless Functions en Vercel**.
+
+Este repo incluye endpoints compatibles en:
+
+- `POST /api/chat`
+- `GET /api/health`
+
+### Configurar variables en Vercel
+
+En tu proyecto de Vercel (Settings → Environment Variables) configurá:
+
+- `GROQ_API_KEY` (o `CEREBRAS_API_KEY`)
+- `FIREBASE_SERVICE_ACCOUNT_JSON`
+
+`FIREBASE_SERVICE_ACCOUNT_JSON` puede ser:
+
+- el JSON completo (texto), o
+- el JSON en **base64** (recomendado para evitar problemas de saltos de línea).
+
+En Windows (PowerShell) podés generar base64 así:
+
+```powershell
+$jsonPath = "C:\ruta\a\serviceAccountKey.json"
+$b64 = [Convert]::ToBase64String([IO.File]::ReadAllBytes($jsonPath))
+$b64
+```
+
+Luego pegás ese valor como `FIREBASE_SERVICE_ACCOUNT_JSON` en Vercel.
+
+### Configurar el frontend para apuntar a Vercel
+
+En producción, seteá:
+
+```bash
+VITE_CHAT_API_URL=https://TU-PROYECTO.vercel.app/api
+```
+
+> Importante: el frontend espera `POST {VITE_CHAT_API_URL}/chat`.
+
 ### Requisitos para que se guarde en Firestore
 
 Para que el backend local pueda escribir en tu proyecto Firebase (Firestore) necesitás:
