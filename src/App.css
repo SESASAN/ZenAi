@@ -3,11 +3,11 @@
   --bg-secondary: #111827;
   --neon-primary: #00e5ff;
   --accent-strong: #00e5ff;
-  --accent-soft: rgba(0, 229, 255, 0.12);
-  --accent-medium: rgba(0, 229, 255, 0.2);
-  --accent-focus: rgba(0, 229, 255, 0.35);
-  --accent-glow: rgba(0, 229, 255, 0.06);
-  --bg-top-glow: rgba(0, 229, 255, 0.08);
+  --accent-soft: rgba(0, 229, 255, 0.09);
+  --accent-medium: rgba(0, 229, 255, 0.16);
+  --accent-focus: rgba(0, 229, 255, 0.28);
+  --accent-glow: rgba(0, 229, 255, 0.045);
+  --bg-top-glow: rgba(0, 229, 255, 0.06);
   --text-primary: #e0f7ff;
   --text-secondary: #94a3b8;
   --text-heading: #f2f7fb;
@@ -15,19 +15,19 @@
   --success: #00ff9c;
   --surface-primary: rgba(8, 15, 28, 0.82);
   --surface-secondary: rgba(15, 23, 42, 0.86);
-  --line-soft: rgba(0, 229, 255, 0.12);
-  --line-strong: rgba(0, 229, 255, 0.2);
+  --line-soft: rgba(0, 229, 255, 0.1);
+  --line-strong: rgba(0, 229, 255, 0.16);
   --message-user-bg: linear-gradient(180deg, rgba(0, 229, 255, 0.18), rgba(0, 175, 220, 0.12));
   --message-user-border: rgba(0, 229, 255, 0.25);
   --message-user-text: #effcff;
-  --message-user-shadow: rgba(0, 229, 255, 0.08);
+  --message-user-shadow: rgba(0, 229, 255, 0.06);
   --message-assistant-bg: rgba(15, 23, 42, 0.88);
   --message-assistant-border: rgba(148, 163, 184, 0.18);
   --message-assistant-text: #dce9f5;
   --button-primary-bg: linear-gradient(180deg, #0dd6f7 0%, #07b9d7 100%);
   --button-primary-text: #031018;
-  --button-primary-shadow: rgba(0, 229, 255, 0.18);
-  --button-primary-shadow-hover: rgba(0, 229, 255, 0.26);
+  --button-primary-shadow: rgba(0, 229, 255, 0.14);
+  --button-primary-shadow-hover: rgba(0, 229, 255, 0.2);
   --button-secondary-bg: rgba(15, 23, 42, 0.88);
   --button-secondary-text: #dff8ff;
   --button-secondary-border: rgba(0, 229, 255, 0.22);
@@ -185,7 +185,7 @@ a {
   height: 44px;
   cursor: pointer;
   transition: transform 0.3s ease, filter 0.4s ease;
-  filter: drop-shadow(0 0 10px var(--accent-strong));
+  filter: drop-shadow(0 0 8px var(--accent-strong));
 }
 
 .sessionHeader__disc:hover {
@@ -197,7 +197,7 @@ a {
     hue-rotate(-120deg)
     saturate(2)
     brightness(1.2)
-    drop-shadow(0 0 10px var(--accent-strong));
+    drop-shadow(0 0 8px var(--accent-strong));
   transform: rotate(180deg);
 }
 
@@ -229,7 +229,7 @@ a {
   padding: 24px;
   border-right: 1px solid rgba(255, 255, 255, 0.05);
   background: rgba(6, 10, 18, 0.8);
-  box-shadow: 0 0 40px 0 var(--accent-glow);
+  box-shadow: 0 0 32px 0 var(--accent-glow);
   backdrop-filter: blur(24px);
 }
 
