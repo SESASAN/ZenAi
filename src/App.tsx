@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import "@/App.css"
-import { Navbar } from "@/components/Navbar"
 import { MessageBubble } from "@/components/MessageBubble"
 import type { Message } from "@/components/MessageBubble"
 import { SendButton } from "@/components/SendButton"
+import { AppShell } from "@/components/layout/AppShell"
+import { SessionHeader } from "@/components/layout/SessionHeader"
+import { SideNav } from "@/components/layout/SideNav"
 import { sendChatMessage } from "@/services/chat/chatApi"
 import { useAuth } from "@/services/firebase/useAuth"
 import {
@@ -113,6 +115,7 @@ function App() {
   const [isSending, setIsSending] = useState(false)
   const [requestError, setRequestError] = useState<string | null>(null)
   const [isAltTheme, setIsAltTheme] = useState(false)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const messageListRef = useRef<HTMLElement | null>(null)
 
   const activeConversation = useMemo(
@@ -147,6 +150,7 @@ function App() {
     setActiveConversationId(newConversation.id)
     setInputValue("")
     setRequestError(null)
+    setIsSidebarOpen(false)
   }
 
   const handleSend = async () => {
@@ -316,62 +320,42 @@ function App() {
   }, [isAltTheme])
 
   return (
-    <div>
-      <Navbar
-        userLabel={user?.displayName ?? user?.email ?? null}
-        onSignIn={() => void signIn()}
-        onSignOut={() => void signOut()}
-        isAltTheme={isAltTheme}
-        onToggleTheme={() => setIsAltTheme((prev) => !prev)}
-      />
-
-      <main className="appMain">
+    <AppShell
+      sidebar={(
+        <SideNav
+          conversations={sortedConversations}
+          activeConversationId={activeConversationId}
+          isOpen={isSidebarOpen}
+          userLabel={user?.displayName ?? user?.email ?? null}
+          canCreateConversation={Boolean(user)}
+          onClose={() => setIsSidebarOpen(false)}
+          onCreateConversation={handleCreateConversation}
+          onSelectConversation={(conversationId) => {
+            setActiveConversationId(conversationId)
+            setRequestError(null)
+            setIsSidebarOpen(false)
+          }}
+          onSignIn={() => void signIn()}
+          onSignOut={() => void signOut()}
+        />
+      )}
+      header={(
+        <SessionHeader
+          eyebrow="Current Session"
+          title={activeConversation?.title ?? "Nueva conversación"}
+          isAltTheme={isAltTheme}
+          onOpenSidebar={() => setIsSidebarOpen(true)}
+          onToggleTheme={() => setIsAltTheme((prev) => !prev)}
+        />
+      )}
+    >
+      <div className="appMain">
         <section className="chatLayout">
-          <aside className="chatSidebar">
-            <div className="chatSidebarHeader">
-              <div>
-                <p className="chatEyebrow">Conversaciones</p>
-                <h2 className="chatSidebarTitle">Tus chats</h2>
-              </div>
-
-              <button
-                className="chatNewButton"
-                onClick={handleCreateConversation}
-                type="button"
-                disabled={!user}
-              >
-                Nuevo chat
-              </button>
-            </div>
-
-            <div className="chatConversationList" aria-label="Lista de conversaciones">
-              {sortedConversations.map((conversation) => {
-                const isActive = conversation.id === activeConversationId
-                const lastMessage = conversation.messages.at(-1)?.content ?? "Sin mensajes todavía"
-
-                return (
-                  <button
-                    key={conversation.id}
-                    className={`chatConversationItem ${isActive ? "chatConversationItem--active" : ""}`}
-                    onClick={() => {
-                      setActiveConversationId(conversation.id)
-                      setRequestError(null)
-                    }}
-                    type="button"
-                  >
-                    <span className="chatConversationTitle">{conversation.title}</span>
-                    <span className="chatConversationPreview">{lastMessage}</span>
-                  </button>
-                )
-              })}
-            </div>
-          </aside>
-
           <section className="chatShell">
             <header className="chatHeader">
               <div>
                 <p className="chatEyebrow">Interfaz conversacional</p>
-                <h1 className="chatTitle">Chat con ZenAI</h1>
+                <h2 className="chatTitle">Chat con ZenAI</h2>
               </div>
             </header>
 
@@ -434,8 +418,8 @@ function App() {
             </form>
           </section>
         </section>
-      </main>
-    </div>
+      </div>
+    </AppShell>
   )
 }
 
