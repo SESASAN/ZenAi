@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import "@/App.css"
-import { MessageBubble } from "@/components/MessageBubble"
 import type { Message } from "@/components/MessageBubble"
 import { SendButton } from "@/components/SendButton"
+import { ChatTimeline } from "@/components/chat/ChatTimeline"
 import { AppShell } from "@/components/layout/AppShell"
 import { SessionHeader } from "@/components/layout/SessionHeader"
 import { SideNav } from "@/components/layout/SideNav"
@@ -117,6 +117,35 @@ function App() {
   const [isAltTheme, setIsAltTheme] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const messageListRef = useRef<HTMLElement | null>(null)
+  const shouldScrollOnNextUserMessageRef = useRef(false)
+
+  const scrollTimelineToBottom = (behavior: ScrollBehavior = "auto") => {
+    const messageListElement = messageListRef.current
+
+    if (!messageListElement) {
+      return
+    }
+
+    const endSentinel = messageListElement.querySelector("[data-chat-end]") as HTMLElement | null
+
+    if (endSentinel) {
+      endSentinel.scrollIntoView({
+        block: "end",
+        behavior
+      })
+    }
+
+    const top = messageListElement.scrollHeight
+
+    try {
+      messageListElement.scrollTo({
+        top,
+        behavior
+      })
+    } catch {
+      messageListElement.scrollTop = top
+    }
+  }
 
   const activeConversation = useMemo(
     () => conversations.find((conversation) => conversation.id === activeConversationId) ?? null,
@@ -184,6 +213,7 @@ function App() {
     }
 
     setRequestError(null)
+    shouldScrollOnNextUserMessageRef.current = true
     setConversations((prev) => prev.map((conversation) => (
       conversation.id === activeConversation.id ? updatedConversation : conversation
     )))
@@ -264,19 +294,6 @@ function App() {
   }, [uid, isAuthLoading])
 
   useEffect(() => {
-    const messageListElement = messageListRef.current
-
-    if (!messageListElement) {
-      return
-    }
-
-    messageListElement.scrollTo({
-      top: messageListElement.scrollHeight,
-      behavior: "smooth"
-    })
-  }, [messages, isSending])
-
-  useEffect(() => {
     if (!uid) {
       return
     }
@@ -294,6 +311,25 @@ function App() {
       setActiveConversationId(conversations[0]?.id ?? null)
     }
   }, [conversations, activeConversationId])
+
+  useEffect(() => {
+    if (!shouldScrollOnNextUserMessageRef.current) {
+      return
+    }
+
+    const lastMessage = messages.at(-1)
+
+    if (!lastMessage || lastMessage.role !== "user") {
+      return
+    }
+
+    shouldScrollOnNextUserMessageRef.current = false
+
+    // Espera a que el DOM refleje el nuevo mensaje antes de medir.
+    window.requestAnimationFrame(() => {
+      scrollTimelineToBottom("auto")
+    })
+  }, [messages])
 
   useEffect(() => {
     const theme = isAltTheme ? "sunset" : "neon"
@@ -350,30 +386,11 @@ function App() {
       <div className="appMain">
         <section className="chatLayout">
           <section className="chatShell">
-            <section
+            <ChatTimeline
               ref={messageListRef}
-              className="messageList"
-              aria-label="Lista de mensajes"
-            >
-              {messages.map((message) => (
-                <MessageBubble key={message.id} message={message} />
-              ))}
-
-              {messages.length === 0 && !isSending && (
-                <div className="chatEmptyState">
-                  <p className="chatEmptyTitle">Este chat está vacío</p>
-                  <p className="chatEmptyDescription">
-                    Empezá la conversación con una idea, una pregunta o una tarea para ZenAI.
-                  </p>
-                </div>
-              )}
-
-              {isSending && (
-                <p className="chatStatus" role="status">
-                  ZenAI está pensando...
-                </p>
-              )}
-            </section>
+              messages={messages}
+              isSending={isSending}
+            />
           </section>
         </section>
 
