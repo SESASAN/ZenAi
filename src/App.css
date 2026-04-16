@@ -86,7 +86,7 @@ body,
 body {
   overflow-x: hidden;
   background:
-    radial-gradient(circle at top, var(--bg-top-glow), transparent 35%),
+    radial-gradient(1200px 720px at 75% -260px, var(--bg-top-glow) 0%, transparent 72%),
     linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
   color: var(--text-primary);
   font-family: Inter, Arial, sans-serif;
@@ -101,17 +101,24 @@ a {
 .ambientGlow {
   position: fixed;
   z-index: 0;
-  width: min(42rem, 90vw);
+  width: min(60rem, 110vw);
   aspect-ratio: 1;
   border-radius: 999px;
-  background: radial-gradient(circle, var(--bg-top-glow) 0%, transparent 68%);
+  opacity: 0.6;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--bg-top-glow) 85%, transparent) 0%,
+    color-mix(in srgb, var(--bg-top-glow) 55%, transparent) 28%,
+    color-mix(in srgb, var(--bg-top-glow) 25%, transparent) 55%,
+    transparent 82%
+  );
   pointer-events: none;
-  filter: blur(10px);
+  filter: blur(44px);
 }
 
 .ambientGlow--top {
-  top: -18rem;
-  right: -14rem;
+  top: -28rem;
+  right: -24rem;
 }
 
 .ambientGlow--bottom {
