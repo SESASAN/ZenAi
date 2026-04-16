@@ -341,8 +341,6 @@ function App() {
       )}
       header={(
         <SessionHeader
-          eyebrow="Current Session"
-          title={activeConversation?.title ?? "Nueva conversación"}
           isAltTheme={isAltTheme}
           onOpenSidebar={() => setIsSidebarOpen(true)}
           onToggleTheme={() => setIsAltTheme((prev) => !prev)}
