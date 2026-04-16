@@ -399,14 +399,11 @@ function App() {
         <div className="composerDock" aria-label="Zona de composición del mensaje">
           <div className="composerDock__inner">
             <form className="composer" onSubmit={handleSubmit}>
-              <label className="composerLabel" htmlFor="chat-input">
-                Escribe un mensaje
-              </label>
-
               <div className="composerRow">
                 <textarea
                   id="chat-input"
                   className="composerInput"
+                  aria-label="Escribir mensaje"
                   placeholder={user
                     ? "Escribe aquí lo que quieres pedirle al asistente..."
                     : "Iniciá sesión para usar el chat."

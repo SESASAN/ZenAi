@@ -563,13 +563,6 @@ a {
   border-top: 0;
 }
 
-.composerLabel {
-  display: inline-block;
-  margin-bottom: 12px;
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-}
-
 .composerRow {
   display: flex;
   align-items: center;
@@ -677,7 +670,19 @@ a {
   }
 
   .composerRow {
-    flex-direction: column;
-    align-items: stretch;
+    gap: 10px;
+    padding: 8px;
+    border-radius: 24px;
+  }
+
+  .composerInput {
+    min-height: 44px;
+    padding: 10px 10px;
+  }
+
+  .composerRow button {
+    min-width: 96px;
+    height: 44px;
+    padding: 0 14px;
   }
 }
