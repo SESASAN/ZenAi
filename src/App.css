@@ -488,7 +488,7 @@ a {
   min-height: 0;
   max-height: none;
   padding-top: 8px;
-  padding-bottom: 180px;
+  padding-bottom: calc(var(--composerDockHeight, 180px) + 28px);
   padding-inline: 24px;
   margin-bottom: 0;
   overflow-y: auto;
@@ -514,9 +514,9 @@ a {
   gap: 10px;
   min-height: 280px;
   padding: 24px;
-  border: 1px dashed var(--line-soft);
+  border: 1px solid color-mix(in srgb, var(--line-soft) 55%, transparent);
   border-radius: 24px;
-  background: rgba(255, 255, 255, 0.02);
+  background: color-mix(in srgb, rgba(255, 255, 255, 0.03) 65%, transparent);
   text-align: center;
 }
 
@@ -534,11 +534,19 @@ a {
   line-height: 1.6;
 }
 
-.chatStatus {
-  margin: 8px 0 0;
+.chatStatusPill {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 10px 0 0;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--line-soft) 55%, transparent);
+  background: color-mix(in srgb, rgba(0, 0, 0, 0.18) 70%, transparent);
   color: var(--text-secondary);
-  font-size: 0.95rem;
-  text-align: center;
+  font-size: 0.9rem;
 }
 
 
@@ -548,7 +556,7 @@ a {
   right: 0;
   bottom: 0;
   padding: 0 24px 24px;
-  background: linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--bg-secondary) 78%, transparent) 35%, var(--bg-secondary) 100%);
+  background: transparent;
   z-index: 10;
 }
 
@@ -570,15 +578,17 @@ a {
   padding: 10px;
   border-radius: 999px;
   border: 1px solid color-mix(in srgb, var(--line-soft) 70%, transparent);
-  background: color-mix(in srgb, rgba(48, 53, 59, 0.6) 70%, transparent);
+  background: rgba(9, 15, 28, 0.9);
   backdrop-filter: blur(20px);
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.38);
   transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
 .composerRow:focus-within {
   border-color: var(--accent-focus);
-  box-shadow: 0 0 0 4px var(--accent-glow);
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.38),
+    0 0 0 4px var(--accent-glow);
 }
 
 .composerInput {
@@ -607,8 +617,12 @@ a {
 
 .chatError {
   margin: 14px 0 0;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--error-color) 55%, transparent);
+  background: color-mix(in srgb, var(--error-color) 14%, transparent);
   color: var(--error-color);
-  font-size: 0.95rem;
+  font-size: 0.92rem;
 }
 
 @media (max-width: 900px) {
@@ -665,7 +679,7 @@ a {
 
   .messageList {
     padding-top: 4px;
-    padding-bottom: 200px;
+    padding-bottom: calc(var(--composerDockHeight, 200px) + 18px);
     padding-inline: 16px;
   }
 

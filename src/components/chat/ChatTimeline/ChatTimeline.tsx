@@ -49,9 +49,9 @@ export const ChatTimeline = forwardRef<HTMLElement, ChatTimelineProps>(function 
         )}
 
         {isSending && (
-          <p className="chatStatus" role="status">
+          <div className="chatStatusPill" role="status">
             ZenAI está pensando...
-          </p>
+          </div>
         )}
 
         <div data-chat-end="" aria-hidden="true" />

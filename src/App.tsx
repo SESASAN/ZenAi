@@ -118,6 +118,7 @@ function App() {
   const [isAltTheme, setIsAltTheme] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const messageListRef = useRef<HTMLElement | null>(null)
+  const composerDockRef = useRef<HTMLDivElement | null>(null)
   const shouldScrollOnNextUserMessageRef = useRef(false)
 
   const scrollTimelineToBottom = (behavior: ScrollBehavior = "auto") => {
@@ -271,6 +272,36 @@ function App() {
   }
 
   useEffect(() => {
+    const dockElement = composerDockRef.current
+
+    if (!dockElement) {
+      return
+    }
+
+    const updateDockHeight = () => {
+      const height = dockElement.offsetHeight
+      document.documentElement.style.setProperty("--composerDockHeight", `${height}px`)
+    }
+
+    updateDockHeight()
+
+    const handleResize = () => updateDockHeight()
+    window.addEventListener("resize", handleResize)
+
+    let resizeObserver: ResizeObserver | null = null
+
+    if ("ResizeObserver" in window) {
+      resizeObserver = new ResizeObserver(() => updateDockHeight())
+      resizeObserver.observe(dockElement)
+    }
+
+    return () => {
+      window.removeEventListener("resize", handleResize)
+      resizeObserver?.disconnect()
+    }
+  }, [])
+
+  useEffect(() => {
     if (isAuthLoading) {
       return
     }
@@ -396,7 +427,11 @@ function App() {
           </section>
         </section>
 
-        <div className="composerDock" aria-label="Zona de composición del mensaje">
+        <div
+          ref={composerDockRef}
+          className="composerDock"
+          aria-label="Zona de composición del mensaje"
+        >
           <div className="composerDock__inner">
             <form className="composer" onSubmit={handleSubmit}>
               <div className="composerRow">
