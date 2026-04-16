@@ -374,7 +374,11 @@ function App() {
                 </p>
               )}
             </section>
+          </section>
+        </section>
 
+        <div className="composerDock" aria-label="Zona de composición del mensaje">
+          <div className="composerDock__inner">
             <form className="composer" onSubmit={handleSubmit}>
               <label className="composerLabel" htmlFor="chat-input">
                 Escribe un mensaje
@@ -407,8 +411,8 @@ function App() {
                 </p>
               )}
             </form>
-          </section>
-        </section>
+          </div>
+        </div>
       </div>
     </AppShell>
   )
