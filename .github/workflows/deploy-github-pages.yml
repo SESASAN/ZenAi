@@ -30,8 +30,10 @@ jobs:
       - name: Install
         run: npm ci
 
-      - name: Build
+      - name: Prepare Vite env (.env.production)
+        shell: bash
         env:
+          VITE_ENV: ${{ secrets.VITE_ENV }}
           VITE_CHAT_API_URL: ${{ secrets.VITE_CHAT_API_URL }}
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
@@ -39,6 +41,35 @@ jobs:
           VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
           VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+        run: |
+          set -euo pipefail
+
+          # Prefer a single secret named VITE_ENV containing dotenv lines.
+          if [ -n "${VITE_ENV:-}" ]; then
+            printf "%s" "$VITE_ENV" > .env.production
+            exit 0
+          fi
+
+          # Fallback to individual secrets (one per variable).
+          : "${VITE_CHAT_API_URL:?Missing secret VITE_CHAT_API_URL (or provide VITE_ENV)}"
+          : "${VITE_FIREBASE_API_KEY:?Missing secret VITE_FIREBASE_API_KEY (or provide VITE_ENV)}"
+          : "${VITE_FIREBASE_AUTH_DOMAIN:?Missing secret VITE_FIREBASE_AUTH_DOMAIN (or provide VITE_ENV)}"
+          : "${VITE_FIREBASE_PROJECT_ID:?Missing secret VITE_FIREBASE_PROJECT_ID (or provide VITE_ENV)}"
+          : "${VITE_FIREBASE_STORAGE_BUCKET:?Missing secret VITE_FIREBASE_STORAGE_BUCKET (or provide VITE_ENV)}"
+          : "${VITE_FIREBASE_MESSAGING_SENDER_ID:?Missing secret VITE_FIREBASE_MESSAGING_SENDER_ID (or provide VITE_ENV)}"
+          : "${VITE_FIREBASE_APP_ID:?Missing secret VITE_FIREBASE_APP_ID (or provide VITE_ENV)}"
+
+          cat > .env.production <<EOF
+          VITE_CHAT_API_URL=$VITE_CHAT_API_URL
+          VITE_FIREBASE_API_KEY=$VITE_FIREBASE_API_KEY
+          VITE_FIREBASE_AUTH_DOMAIN=$VITE_FIREBASE_AUTH_DOMAIN
+          VITE_FIREBASE_PROJECT_ID=$VITE_FIREBASE_PROJECT_ID
+          VITE_FIREBASE_STORAGE_BUCKET=$VITE_FIREBASE_STORAGE_BUCKET
+          VITE_FIREBASE_MESSAGING_SENDER_ID=$VITE_FIREBASE_MESSAGING_SENDER_ID
+          VITE_FIREBASE_APP_ID=$VITE_FIREBASE_APP_ID
+          EOF
+
+      - name: Build
         run: npm run build
 
       - name: Upload artifact
