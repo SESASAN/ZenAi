@@ -10,6 +10,7 @@ interface SideNavProps {
   onClose: () => void
   onCreateConversation: () => void
   onSelectConversation: (conversationId: string) => void
+  onDeleteConversation: (conversationId: string) => void
   onSignIn: () => void
   onSignOut: () => void
 }
@@ -30,6 +31,7 @@ export function SideNav({
   onClose,
   onCreateConversation,
   onSelectConversation,
+  onDeleteConversation,
   onSignIn,
   onSignOut
 }: SideNavProps) {
@@ -95,15 +97,27 @@ export function SideNav({
               const preview = conversation.messages.at(-1)?.content ?? "Sin mensajes todavía"
 
               return (
-                <button
+                <div
                   key={conversation.id}
                   className={`sideNav__conversationItem ${isActive ? "sideNav__conversationItem--active" : ""}`}
-                  type="button"
-                  onClick={() => onSelectConversation(conversation.id)}
                 >
-                  <span className="sideNav__conversationTitle">{conversation.title}</span>
-                  <span className="sideNav__conversationPreview">{preview}</span>
-                </button>
+                  <button
+                    className="sideNav__conversationContent"
+                    type="button"
+                    onClick={() => onSelectConversation(conversation.id)}
+                  >
+                    <span className="sideNav__conversationTitle">{conversation.title}</span>
+                    <span className="sideNav__conversationPreview">{preview}</span>
+                  </button>
+                  <button
+                    className="sideNav__deleteButton"
+                    type="button"
+                    onClick={() => onDeleteConversation(conversation.id)}
+                    aria-label="Eliminar chat"
+                  >
+                    🗑
+                  </button>
+                </div>
               )
             })}
           </div>

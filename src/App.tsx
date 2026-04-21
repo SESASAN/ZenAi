@@ -316,6 +316,13 @@ function ChatView({ user }: { user: NonNullable<ReturnType<typeof useAuth>["user
             setRequestError(null)
             setIsSidebarOpen(false)
           }}
+          onDeleteConversation={(conversationId) => {
+            const updated = conversations.filter((c) => c.id !== conversationId)
+            setConversations(updated)
+            if (activeConversationId === conversationId) {
+              setActiveConversationId(updated[0]?.id ?? null)
+            }
+          }}
           onSignIn={() => void signIn()}
           onSignOut={() => void signOut()}
         />
