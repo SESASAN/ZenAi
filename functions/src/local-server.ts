@@ -2,7 +2,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from "node:ht
 
 import { parseChatRequest } from "./chat/application/chat-request.validator.js";
 import { ChatService, type ChatLogRepository } from "./chat/application/chat.service.js";
-import { ChatValidationError, ProviderConfigurationError, ProviderRequestError } from "./chat/domain/chat.errors.js";
+import { ChatValidationError, ProviderConfigurationError, ProviderRequestError, RateLimitError } from "./chat/domain/chat.errors.js";
 import { createProviderRegistry, DEFAULT_PROVIDER } from "./chat/infrastructure/providers/provider-registry.js";
 import { getAuth } from "firebase-admin/auth";
 
@@ -114,9 +114,20 @@ const server = createServer(async (request, response) => {
       return;
     }
 
-    if (error instanceof ProviderRequestError) {
+if (error instanceof ProviderRequestError) {
       setJsonHeaders(response, 502);
       response.end(JSON.stringify({ error: error.message }));
+      return;
+    }
+
+    if (error instanceof RateLimitError) {
+      setJsonHeaders(response, 429);
+      response.end(
+        JSON.stringify({
+          error: error.message,
+          retryAfterSeconds: error.retryAfterSeconds,
+        }),
+      );
       return;
     }
 

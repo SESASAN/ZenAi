@@ -18,3 +18,14 @@ export class ProviderRequestError extends Error {
     this.name = "ProviderRequestError";
   }
 }
+
+export class RateLimitError extends Error {
+  readonly retryAfterSeconds: number;
+
+  constructor(retryAfterSeconds: number) {
+    const minutes = Math.ceil(retryAfterSeconds / 60);
+    super(`Se acabaron las peticiones de hoy. Volvé a intentarlo en ${minutes} minuto${minutes !== 1 ? "s" : ""}.`);
+    this.name = "RateLimitError";
+    this.retryAfterSeconds = retryAfterSeconds;
+  }
+}

@@ -671,6 +671,32 @@ a {
   font-size: 0.92rem;
 }
 
+.rateLimitAlert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 14px 0 0;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--accent-soft) 50%, transparent);
+  background: color-mix(in srgb, var(--accent-soft) 18%, transparent);
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+.rateLimitAlert__message {
+  flex: 1;
+  color: var(--text-primary);
+}
+
+.rateLimitAlert__timer {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-focus);
+  font-weight: 700;
+}
+
 @media (max-width: 900px) {
   .appShell__main {
     padding-left: 0;

@@ -1,5 +1,5 @@
 import type { ChatCompletion, ChatProvider, ChatRequest, LlmProviderName } from "../../domain/chat.types.js";
-import { ProviderConfigurationError, ProviderRequestError } from "../../domain/chat.errors.js";
+import { ProviderConfigurationError, ProviderRequestError, RateLimitError } from "../../domain/chat.errors.js";
 
 type OpenAiCompatibleProviderConfig = {
   provider: LlmProviderName;
@@ -54,6 +54,13 @@ export class OpenAiCompatibleProvider implements ChatProvider {
     const payload = (await response.json()) as OpenAiCompatibleResponse;
 
     if (!response.ok) {
+      if (response.status === 429) {
+        const retryAfter = response.headers.get("retry-after");
+        const seconds = retryAfter ? parseInt(retryAfter, 10) : 3600;
+        if (!Number.isNaN(seconds)) {
+          throw new RateLimitError(seconds);
+        }
+      }
       throw new ProviderRequestError(
         payload.error?.message ?? `El provider ${this.config.provider} respondió con estado ${response.status}.`,
       );

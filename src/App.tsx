@@ -10,7 +10,8 @@ import { SideNav } from "@/components/layout/SideNav"
 import { LandingPage } from "@/pages/LandingPage"
 import { LoginPage } from "@/pages/LoginPage"
 import { RegisterPage } from "@/pages/RegisterPage"
-import { sendChatMessage } from "@/services/chat/chatApi"
+import { sendChatMessage, RateLimitError } from "@/services/chat/chatApi"
+import { RateLimitAlert } from "@/components/RateLimitAlert"
 import { useAuth } from "@/services/firebase/useAuth"
 import {
   buildConversationTitle,
@@ -67,6 +68,7 @@ function ChatView({ user }: { user: NonNullable<ReturnType<typeof useAuth>["user
   const [inputValue, setInputValue] = useState("")
   const [isSending, setIsSending] = useState(false)
   const [requestError, setRequestError] = useState<string | null>(null)
+  const [retryAfterSeconds, setRetryAfterSeconds] = useState<number | null>(null)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const messageListRef = useRef<HTMLElement | null>(null)
   const composerDockRef = useRef<HTMLDivElement | null>(null)
@@ -186,11 +188,18 @@ function ChatView({ user }: { user: NonNullable<ReturnType<typeof useAuth>["user
         }
       }))
     } catch (error) {
+      if (error instanceof RateLimitError) {
+        setRequestError(error.message)
+        setRetryAfterSeconds(error.retryAfterSeconds)
+        setIsSending(false)
+        return
+      }
       const message = error instanceof Error
         ? error.message
         : "No se pudo conectar con el backend del chat."
 
       setRequestError(message)
+      setRetryAfterSeconds(null)
     } finally {
       setIsSending(false)
     }
@@ -260,6 +269,7 @@ function ChatView({ user }: { user: NonNullable<ReturnType<typeof useAuth>["user
     setActiveConversationId(nextConversations[0]?.id ?? null)
     setInputValue("")
     setRequestError(null)
+    setRetryAfterSeconds(null)
   }, [uid])
 
   useEffect(() => {
@@ -314,6 +324,7 @@ function ChatView({ user }: { user: NonNullable<ReturnType<typeof useAuth>["user
           onSelectConversation={(conversationId) => {
             setActiveConversationId(conversationId)
             setRequestError(null)
+            setRetryAfterSeconds(null)
             setIsSidebarOpen(false)
           }}
           onDeleteConversation={(conversationId) => {
@@ -370,11 +381,20 @@ function ChatView({ user }: { user: NonNullable<ReturnType<typeof useAuth>["user
                 />
               </div>
 
-              {requestError && (
+              {retryAfterSeconds !== null ? (
+                <RateLimitAlert
+                  message={requestError ?? "Se acabaron las peticiones de hoy."}
+                  retryAfterSeconds={retryAfterSeconds}
+                  onDismiss={() => {
+                    setRetryAfterSeconds(null)
+                    setRequestError(null)
+                  }}
+                />
+              ) : requestError ? (
                 <p className="chatError" role="alert">
                   {requestError}
                 </p>
-              )}
+              ) : null}
             </form>
           </div>
         </div>

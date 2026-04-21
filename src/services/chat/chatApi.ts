@@ -20,6 +20,17 @@ type ChatApiResponse = {
 
 type ChatApiError = {
   error?: string
+  retryAfterSeconds?: number
+}
+
+export class RateLimitError extends Error {
+  readonly retryAfterSeconds: number
+
+  constructor(retryAfterSeconds: number) {
+    super("Se acabaron las peticiones de hoy. Volvé a intentarlo más tarde.")
+    this.name = "RateLimitError"
+    this.retryAfterSeconds = retryAfterSeconds
+  }
 }
 
 const DEFAULT_CHAT_API_URL = "http://127.0.0.1:3001"
@@ -57,7 +68,11 @@ export async function sendChatMessage(
   const data = (await response.json()) as ChatApiResponse | ChatApiError
 
   if (!response.ok) {
-    const errorMessage = "error" in data ? data.error : undefined
+    const errorData = data as ChatApiError
+    if (response.status === 429 && errorData.retryAfterSeconds) {
+      throw new RateLimitError(errorData.retryAfterSeconds)
+    }
+    const errorMessage = errorData.error || undefined
     throw new Error(errorMessage || "No se pudo obtener respuesta del asistente.")
   }
 
