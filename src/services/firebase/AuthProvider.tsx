@@ -1,7 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import type { User } from "firebase/auth";
 
-import { signInWithGoogle, signOutUser, subscribeToAuthState } from "./auth";
+import {
+  signInWithEmail,
+  signInWithGithub,
+  signInWithGoogle,
+  signOutUser,
+  signUpWithEmail,
+  subscribeToAuthState,
+} from "./auth";
 import { AuthContext, type AuthContextValue } from "./authContext";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -23,6 +30,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isLoading,
       signIn: async () => {
         await signInWithGoogle();
+      },
+      signInWithEmail: async (email: string, password: string) => {
+        await signInWithEmail(email, password);
+      },
+      signUpWithEmail: async (email: string, password: string, displayName?: string) => {
+        await signUpWithEmail(email, password, displayName);
+      },
+      signInWithGithub: async () => {
+        await signInWithGithub();
       },
       signOut: async () => {
         await signOutUser();

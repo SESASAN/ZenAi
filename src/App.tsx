@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react"
+import { Routes, Route, Navigate } from "react-router-dom"
 import "@/App.css"
 import type { Message } from "@/components/MessageBubble"
 import { SendButton } from "@/components/SendButton"
@@ -6,6 +7,8 @@ import { ChatTimeline } from "@/components/chat/ChatTimeline"
 import { AppShell } from "@/components/layout/AppShell"
 import { SessionHeader } from "@/components/layout/SessionHeader"
 import { SideNav } from "@/components/layout/SideNav"
+import { LoginPage } from "@/pages/LoginPage"
+import { RegisterPage } from "@/pages/RegisterPage"
 import { sendChatMessage } from "@/services/chat/chatApi"
 import { useAuth } from "@/services/firebase/useAuth"
 import {
@@ -15,8 +18,6 @@ import {
   saveConversations,
   type ChatConversation
 } from "@/services/chat/chatStorage"
-
-const FAVICON_LINK_ID = "zenai-dynamic-favicon"
 
 type FaviconPalette = {
   glowStart: string
@@ -33,6 +34,8 @@ type FaviconPalette = {
   segmentA: string
   segmentB: string
 }
+
+const FAVICON_LINK_ID = "zenai-dynamic-favicon"
 
 const FAVICON_PALETTES: Record<"neon" | "sunset", FaviconPalette> = {
   neon: {
@@ -386,7 +389,32 @@ function App() {
       document.documentElement.removeAttribute("data-theme")
       document.body.removeAttribute("data-theme")
     }
-  }, [isAltTheme])
+}, [isAltTheme])
+
+  if (isAuthLoading) {
+    return (
+      <div className="login-page">
+        <div className="login-atmospheric">
+          <div className="login-glow login-glow--top" />
+          <div className="login-glow login-glow--bottom" />
+          <div className="login-bg-glow" />
+        </div>
+        <div className="login-branding">
+          <h1 className="login-title">ZenAI</h1>
+        </div>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return (
+      <Routes>
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    )
+  }
 
   return (
     <AppShell
