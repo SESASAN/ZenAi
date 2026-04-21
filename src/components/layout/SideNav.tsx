@@ -15,12 +15,6 @@ interface SideNavProps {
   onSignOut: () => void
 }
 
-const NAV_ITEMS = [
-  { label: "Models", disabled: false },
-  { label: "History", disabled: true },
-  { label: "Library", disabled: true }
-] as const
-
 export function SideNav({
   conversations,
   activeConversationId,
@@ -72,19 +66,6 @@ export function SideNav({
           <span aria-hidden="true">＋</span>
           New Chat
         </button>
-
-        <nav className="sideNav__nav" aria-label="Secciones principales">
-          {NAV_ITEMS.map((item, index) => (
-            <button
-              key={item.label}
-              className={`sideNav__navItem ${index === 0 ? "sideNav__navItem--active" : ""}`}
-              type="button"
-              disabled={item.disabled}
-            >
-              {item.label}
-            </button>
-          ))}
-        </nav>
 
         <section className="sideNav__conversations" aria-label="Lista de conversaciones">
           <div className="sideNav__conversationsHeader">
@@ -141,9 +122,6 @@ export function SideNav({
 
             <div className="sideNav__profileCopy">
               <span className="sideNav__profileName">{userLabel ?? "Invitado"}</span>
-              <span className="sideNav__profileMeta">
-                {userLabel ? "Sesión iniciada" : "Necesitás ingresar"}
-              </span>
             </div>
           </div>
 
