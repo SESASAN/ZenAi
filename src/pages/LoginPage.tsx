@@ -1,6 +1,7 @@
 import { useState, useEffect, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/services/firebase/useAuth";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ export function LoginPage() {
 
   useEffect(() => {
     if (user) {
-      navigate("/", { replace: true });
+      navigate("/chat", { replace: true });
     }
   }, [user, navigate]);
 
@@ -23,7 +24,7 @@ export function LoginPage() {
 
     try {
       await signInWithEmail(email, password);
-      navigate("/", { replace: true });
+      navigate("/chat", { replace: true });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Authentication failed";
       setError(message);
@@ -37,7 +38,7 @@ export function LoginPage() {
     setIsLoading(true);
     try {
       await signIn();
-      navigate("/", { replace: true });
+      navigate("/chat", { replace: true });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Google sign-in failed";
       setError(message);
@@ -51,7 +52,7 @@ export function LoginPage() {
     setIsLoading(true);
     try {
       await signInWithGithub();
-      navigate("/", { replace: true });
+      navigate("/chat", { replace: true });
     } catch (err) {
       const message = err instanceof Error ? err.message : "GitHub sign-in failed";
       setError(message);
@@ -66,6 +67,10 @@ export function LoginPage() {
         <div className="login-glow login-glow--top" />
         <div className="login-glow login-glow--bottom" />
         <div className="login-bg-glow" />
+      </div>
+
+      <div className="login-theme-toggle">
+        <ThemeToggle />
       </div>
 
       <main className="login-container">

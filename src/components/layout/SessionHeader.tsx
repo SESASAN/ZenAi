@@ -1,23 +1,20 @@
 import disc from "@/assets/disc.svg"
+import { useTheme } from "@/components/ThemeContext"
 
 interface SessionHeaderProps {
-  isAltTheme: boolean
   onOpenSidebar?: () => void
-  onToggleTheme: () => void
 }
 
-export function SessionHeader({
-  isAltTheme,
-  onOpenSidebar,
-  onToggleTheme
-}: SessionHeaderProps) {
+export function SessionHeader({ onOpenSidebar }: SessionHeaderProps) {
+  const { isAltTheme, toggleTheme } = useTheme()
+
   return (
     <header className="sessionHeader">
       <div className="sessionHeader__actions">
         <img
           src={disc}
           className={`sessionHeader__disc ${isAltTheme ? "sessionHeader__disc--alt" : ""}`}
-          onClick={onToggleTheme}
+          onClick={toggleTheme}
           alt="Cambiar paleta visual"
           role="button"
           aria-label="Cambiar color de la interfaz"

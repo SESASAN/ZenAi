@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/services/firebase/useAuth";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export function RegisterPage() {
   const navigate = useNavigate();
@@ -42,7 +43,7 @@ export function RegisterPage() {
     setIsLoading(true);
     try {
       await signIn();
-      navigate("/", { replace: true });
+      navigate("/chat", { replace: true });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Google sign-in failed";
       setError(message);
@@ -56,7 +57,7 @@ export function RegisterPage() {
     setIsLoading(true);
     try {
       await signInWithGithub();
-      navigate("/", { replace: true });
+      navigate("/chat", { replace: true });
     } catch (err) {
       const message = err instanceof Error ? err.message : "GitHub sign-in failed";
       setError(message);
@@ -71,6 +72,10 @@ export function RegisterPage() {
         <div className="register-glow register-glow--top" />
         <div className="register-glow register-glow--bottom" />
         <div className="register-carbon" />
+      </div>
+
+      <div className="register-theme-toggle">
+        <ThemeToggle />
       </div>
 
       <main className="register-container">
