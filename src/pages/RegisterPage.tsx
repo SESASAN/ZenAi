@@ -1,17 +1,23 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/services/firebase/useAuth";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 export function RegisterPage() {
   const navigate = useNavigate();
-  const { signIn, signInWithGithub, signUpWithEmail } = useAuth();
+  const { user, signIn, signInWithGithub, signUpWithEmail } = useAuth();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (user) {
+      navigate("/chat", { replace: true });
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -30,6 +36,7 @@ export function RegisterPage() {
     setIsLoading(true);
     try {
       await signUpWithEmail(email, password, fullName);
+      navigate("/chat", { replace: true });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Registration failed";
       setError(message);
