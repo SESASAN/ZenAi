@@ -43,6 +43,16 @@ type ChatCompletion = {
   };
 };
 
+class RateLimitError extends Error {
+  readonly retryAfterSeconds: number;
+
+  constructor(retryAfterSeconds: number) {
+    super("Se acabaron las peticiones de hoy. Volvé a intentarlo más tarde.");
+    this.name = "RateLimitError";
+    this.retryAfterSeconds = retryAfterSeconds;
+  }
+}
+
 function applyCors(res: { setHeader(name: string, value: string): void }) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
@@ -147,9 +157,21 @@ async function callProvider(request: Required<Pick<ChatRequest, "messages">> & C
     error?: { message?: string };
   };
 
-  const payload = (await response.json()) as ProviderPayload;
+  let payload: ProviderPayload = {};
+
+  try {
+    payload = (await response.json()) as ProviderPayload;
+  } catch {
+    payload = {};
+  }
 
   if (!response.ok) {
+    if (response.status === 429) {
+      const retryAfterHeader = response.headers.get("retry-after");
+      const seconds = retryAfterHeader ? parseInt(retryAfterHeader, 10) : 3600;
+      throw new RateLimitError(Number.isNaN(seconds) ? 3600 : seconds);
+    }
+
     const message = payload?.error?.message;
     throw new Error(message || `El provider ${provider} respondió con estado ${response.status}.`);
   }
@@ -261,6 +283,13 @@ export default async function handler(req: RequestLike, res: ResponseLike) {
     res.setHeader("Content-Type", "application/json; charset=utf-8");
     res.end(JSON.stringify(completion));
   } catch (error) {
+    if (error instanceof RateLimitError) {
+      res.statusCode = 429;
+      res.setHeader("Content-Type", "application/json; charset=utf-8");
+      res.end(JSON.stringify({ error: error.message, retryAfterSeconds: error.retryAfterSeconds }));
+      return;
+    }
+
     const message = error instanceof Error ? error.message : "Error interno al generar la respuesta del chat.";
 
     res.statusCode = message.includes("Token") || message.includes("sesión") ? 401 : 500;
