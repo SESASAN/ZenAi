@@ -1,9 +1,10 @@
 import { useState, useEffect, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/services/firebase/useAuth";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 export function LoginPage() {
+  const baseUrl = import.meta.env.BASE_URL;
   const navigate = useNavigate();
   const { user, signIn, signInWithGithub, signInWithEmail } = useAuth();
   const [email, setEmail] = useState("");
@@ -155,7 +156,7 @@ export function LoginPage() {
               <img
                 alt="Google"
                 className="login-social-icon"
-                src="/google-icon-logo-svgrepo-com.svg"
+                src={`${baseUrl}google-icon-logo-svgrepo-com.svg`}
               />
               <span>Google</span>
             </button>
@@ -167,7 +168,7 @@ export function LoginPage() {
               <img
                 alt="GitHub"
                 className="login-social-icon"
-                src="/github-white.svg"
+                src={`${baseUrl}github-white.svg`}
               />
               <span>GitHub</span>
             </button>
@@ -175,9 +176,9 @@ export function LoginPage() {
 
           <p className="login-footer">
             Don't have an account?{" "}
-            <a className="login-footer-link" href="/register">
+            <Link className="login-footer-link" to="/register">
               Create access
-            </a>
+            </Link>
           </p>
         </div>
 

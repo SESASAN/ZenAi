@@ -2,12 +2,14 @@ import { Link } from "react-router-dom";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 export function LandingPage() {
+  const baseUrl = import.meta.env.BASE_URL;
+
   return (
     <div className="landing-page">
       <nav className="landing-nav">
         <div className="landing-nav-inner">
           <Link to="/" className="landing-brand">
-            <img alt="ZenAI" src="/icon.svg" className="landing-brand-icon" />
+            <img alt="ZenAI" src={`${baseUrl}icon.svg`} className="landing-brand-icon" />
             <span>ZenAI</span>
           </Link>
           <div className="landing-nav-links">
@@ -167,7 +169,7 @@ export function LandingPage() {
       <footer className="landing-footer">
         <div className="landing-footer-inner">
           <Link to="/" className="landing-footer-brand">
-            <img alt="ZenAI" src="/icon.svg" className="landing-footer-icon" />
+            <img alt="ZenAI" src={`${baseUrl}icon.svg`} className="landing-footer-icon" />
             <span>ZenAI</span>
           </Link>
           <div className="landing-footer-links">

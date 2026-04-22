@@ -1,9 +1,10 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/services/firebase/useAuth";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 export function RegisterPage() {
+  const baseUrl = import.meta.env.BASE_URL;
   const navigate = useNavigate();
   const { user, signIn, signInWithGithub, signUpWithEmail } = useAuth();
   const [fullName, setFullName] = useState("");
@@ -186,7 +187,7 @@ export function RegisterPage() {
               onClick={handleGoogleSignIn}
               disabled={isLoading}
             >
-              <img alt="Google" className="register-social-icon" src="/google-icon-logo-svgrepo-com.svg" />
+              <img alt="Google" className="register-social-icon" src={`${baseUrl}google-icon-logo-svgrepo-com.svg`} />
               <span>Google</span>
             </button>
             <button
@@ -194,14 +195,14 @@ export function RegisterPage() {
               onClick={handleGithubSignIn}
               disabled={isLoading}
             >
-              <img alt="GitHub" className="register-social-icon" src="/github-white.svg" />
+              <img alt="GitHub" className="register-social-icon" src={`${baseUrl}github-white.svg`} />
               <span>GitHub</span>
             </button>
           </div>
 
           <p className="register-footer">
             Already have an account?{" "}
-            <a className="register-footer-link" href="/login">Sign In</a>
+            <Link className="register-footer-link" to="/login">Sign In</Link>
           </p>
         </div>
       </main>
