@@ -16,8 +16,7 @@ export function LandingPage() {
           </Link>
           <div className="landing-nav-links">
             <a className="landing-nav-link landing-nav-link--active" href="#">Features</a>
-            <a className="landing-nav-link" href="#">Models</a>
-            <a className="landing-nav-link" href="#">Pricing</a>
+            <a className="landing-nav-link" href="#pricing">Pricing</a>
           </div>
           <Link to="/register" className="landing-nav-cta">
             Get Started
@@ -152,22 +151,37 @@ export function LandingPage() {
               </div>
             </div>
           </div>
+          <div id="pricing" className="landing-anchor" />
         </section>
       </main>
 
       <footer className="landing-footer">
         <div className="landing-footer-inner">
-          <Link to="/" className="landing-footer-brand">
-            <img alt="ZenAI" src={getZenaiMarkDataUrl(isAltTheme)} className="landing-footer-icon" />
-            <span>ZenAI</span>
-          </Link>
-          <div className="landing-footer-links">
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Service</a>
-            <a href="#">Contact Support</a>
-            <a href="#">Status</a>
+          <div className="landing-footer-top">
+            <Link to="/" className="landing-footer-brand">
+              <img alt="ZenAI" src={getZenaiMarkDataUrl(isAltTheme)} className="landing-footer-icon" />
+              <span>ZenAI</span>
+            </Link>
+            <div className="landing-footer-links">
+              <a href="#">Privacy Policy</a>
+              <a href="#">Terms of Service</a>
+              <a href="#">Contact Support</a>
+              <a href="#">Status</a>
+            </div>
           </div>
-          <p>© 2024 ZenAI Digital Sanctuary. All rights reserved.</p>
+
+          <p className="landing-footer-legal">
+            © {new Date().getFullYear()} ZenAI Digital Sanctuary. All rights reserved. Created by{" "}
+            <a
+              className="landing-footer-credit-link"
+              href="https://sesasan.is-a.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              SESASAN
+            </a>
+            .
+          </p>
         </div>
       </footer>
     </div>

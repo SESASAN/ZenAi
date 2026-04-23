@@ -23,3 +23,8 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# Project-local agent instructions / skills (not meant to be committed)
+AGENTS.md
+agents.md
+skills/

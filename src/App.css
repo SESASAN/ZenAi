@@ -118,6 +118,10 @@ a {
   color: inherit;
 }
 
+.landing-anchor {
+  scroll-margin-top: 120px;
+}
+
 .ambientGlow {
   position: fixed;
   z-index: 0;
@@ -1685,30 +1689,7 @@ a {
    They conflicted with the newer "Features Section" styles below, causing the
    header and the blocks to layout side-by-side (because the <section> became a 3-col grid). */
 
-.landing-footer {
-  position: relative;
-  z-index: 10;
-  padding: 24px;
-  text-align: center;
-  border-top: 1px solid var(--line-soft);
-}
-
-.landing-footer-content {
-  display: flex;
-  justify-content: center;
-  gap: 24px;
-}
-
-.landing-footer-brand {
-  font-family: var(--font-headline, Manrope), sans-serif;
-  font-weight: 800;
-  color: var(--neon-primary);
-}
-
-.landing-footer-copy {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-}
+/* NOTE: legacy footer styles removed (use the "Footer" block near the end of this file). */
 
 /* Landing Page - Full Design */
 .landing-page {
@@ -2217,8 +2198,10 @@ a {
 
 /* Footer */
 .landing-footer {
-  background: var(--bg-primary);
+  /* Differentiator from the main page background */
+  background: var(--bg-secondary);
   padding: 48px 32px;
+  border-top: 1px solid var(--line-soft);
 }
 
 .landing-footer-inner {
@@ -2228,13 +2211,16 @@ a {
   gap: 24px;
   max-width: 1120px;
   margin: 0 auto;
+  text-align: center;
 }
 
-@media (min-width: 768px) {
-  .landing-footer-inner {
-    flex-direction: row;
-    justify-content: space-between;
-  }
+.landing-footer-top {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
 }
 
 .landing-footer-brand {
@@ -2310,11 +2296,12 @@ a {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 32px;
+  align-items: center;
+  gap: 16px;
 }
 
 .landing-footer-links a {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -2327,18 +2314,22 @@ a {
   color: var(--neon-primary);
 }
 
-.landing-footer-inner > p {
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.05em;
+.landing-footer-legal {
+  margin: 0;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-secondary);
   width: 100%;
   text-align: center;
 }
 
-@media (min-width: 768px) {
-  .landing-footer-inner > p {
-    width: auto;
-  }
+.landing-footer-credit-link {
+  color: var(--neon-primary);
+  text-decoration: none;
+}
+
+.landing-footer-credit-link:hover {
+  text-decoration: underline;
 }
