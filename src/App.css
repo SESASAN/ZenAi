@@ -41,6 +41,7 @@
   --button-secondary-border-hover: rgba(0, 229, 255, 0.38);
   --pricing-featured-border: rgba(0, 229, 255, 0.3);
   --pricing-featured-glow: rgba(0, 229, 255, 0.2);
+  --pricing-featured-btn-glow-base: rgba(0, 229, 255, 0.3);
   --pricing-featured-btn-glow: rgba(0, 229, 255, 0.4);
   --error-color: #fca5a5;
 }
@@ -87,6 +88,7 @@
   --button-secondary-border-hover: rgba(255, 140, 0, 0.4);
   --pricing-featured-border: rgba(255, 140, 0, 0.3);
   --pricing-featured-glow: rgba(255, 140, 0, 0.24);
+  --pricing-featured-btn-glow-base: rgba(255, 140, 0, 0.34);
   --pricing-featured-btn-glow: rgba(255, 140, 0, 0.46);
   --error-color: #ffd3b6;
 }
@@ -2180,7 +2182,7 @@ a {
   transition: background 0.3s ease;
 }
 
-.landing-pricing-btn:hover {
+.landing-pricing-btn:not(.landing-pricing-btn--primary):hover {
   background: rgba(255, 255, 255, 0.05);
 }
 
@@ -2189,7 +2191,7 @@ a {
   color: var(--bg-primary);
   font-weight: 700;
   border: none;
-  box-shadow: 0 4px 20px rgba(0, 229, 255, 0.3);
+  box-shadow: 0 4px 20px var(--pricing-featured-btn-glow-base);
 }
 
 .landing-pricing-btn--primary:hover {
