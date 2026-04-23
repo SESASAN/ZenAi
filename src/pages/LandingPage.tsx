@@ -1,15 +1,17 @@
 import { Link } from "react-router-dom";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useTheme } from "@/components/ThemeContext";
+import { getZenaiMarkDataUrl } from "@/branding/zenaiMark";
 
 export function LandingPage() {
-  const baseUrl = import.meta.env.BASE_URL;
+  const { isAltTheme } = useTheme();
 
   return (
     <div className="landing-page">
       <nav className="landing-nav">
         <div className="landing-nav-inner">
           <Link to="/" className="landing-brand">
-            <img alt="ZenAI" src={`${baseUrl}icon.svg`} className="landing-brand-icon" />
+            <img alt="ZenAI" src={getZenaiMarkDataUrl(isAltTheme)} className="landing-brand-icon" />
             <span>ZenAI</span>
           </Link>
           <div className="landing-nav-links">
@@ -49,24 +51,6 @@ export function LandingPage() {
               <button className="landing-btn landing-btn--secondary">
                 View Documentation
               </button>
-            </div>
-          </div>
-        </section>
-
-        <section className="landing-showcase">
-          <div className="landing-showcase-inner">
-            <div className="landing-showcase-gradient" />
-            <img
-              alt="ZenAI Interface Mockup"
-              className="landing-showcase-image"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpzWhHnZfbGkC0g25EAwiJ0lLjTXkxao-jsUXWic9eRb40ZDIru6irSqQV6-_rgxXyKxwAicqBE8xytAsucQvGM1OWLMT87gW9dAmzIh5dsRZrHsIEbIKPDvANZBHNVHq6G4po3T3qPxbQ3rtg_qqS9HKzdzx7J5nEcRdtep2u07migbuQLjYBd3liLQ8hkdt6N2UBIefLgi-BbbXvFET4u_shuUbU0D-m0kP9Q5FAXbCxanenS1ahGLp_l5_XOVb47B8YowghsLwQ"
-            />
-            <div className="landing-showcase-card">
-              <div className="landing-showcase-status">
-                <div className="landing-showcase-dot" />
-                <span>AI Live Status</span>
-              </div>
-              <p>"Synthesizing your request within the sanctuary environment. Neural pathways optimized."</p>
             </div>
           </div>
         </section>
@@ -169,7 +153,7 @@ export function LandingPage() {
       <footer className="landing-footer">
         <div className="landing-footer-inner">
           <Link to="/" className="landing-footer-brand">
-            <img alt="ZenAI" src={`${baseUrl}icon.svg`} className="landing-footer-icon" />
+            <img alt="ZenAI" src={getZenaiMarkDataUrl(isAltTheme)} className="landing-footer-icon" />
             <span>ZenAI</span>
           </Link>
           <div className="landing-footer-links">

@@ -8,6 +8,13 @@
   --accent-focus: rgba(0, 229, 255, 0.28);
   --accent-glow: rgba(0, 229, 255, 0.045);
   --bg-top-glow: rgba(0, 229, 255, 0.06);
+  /* Landing token aliases (keep landing styles themeable) */
+  --primary-fixed-dim: var(--neon-primary);
+  --primary-fixed: var(--text-primary);
+  --primary-container: var(--neon-primary);
+  --on-primary-container: var(--bg-primary);
+  --secondary-container: #fd9000;
+  --surface-container-high: var(--surface-secondary);
   --text-primary: #e0f7ff;
   --text-secondary: #94a3b8;
   --text-heading: #f2f7fb;
@@ -45,6 +52,13 @@
   --accent-focus: rgba(255, 140, 0, 0.4);
   --accent-glow: rgba(255, 140, 0, 0.08);
   --bg-top-glow: rgba(255, 140, 0, 0.12);
+  /* Landing token aliases (keep landing styles themeable) */
+  --primary-fixed-dim: var(--neon-primary);
+  --primary-fixed: var(--text-primary);
+  --primary-container: var(--neon-primary);
+  --on-primary-container: var(--bg-primary);
+  --secondary-container: #ff6a00;
+  --surface-container-high: var(--surface-secondary);
   --text-primary: #fff1e6;
   --text-secondary: #d2ab90;
   --text-heading: #fff8f2;
@@ -1661,38 +1675,9 @@ a {
   background: var(--bg-secondary);
 }
 
-.landing-features {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 32px;
-  width: 100%;
-}
-
-.landing-feature {
-  text-align: center;
-  padding: 24px;
-}
-
-.landing-feature-icon {
-  display: inline-block;
-  font-size: 2rem;
-  color: var(--neon-primary);
-  margin-bottom: 16px;
-}
-
-.landing-feature-title {
-  margin: 0 0 8px;
-  font-family: var(--font-headline, Manrope), sans-serif;
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: var(--text-heading);
-}
-
-.landing-feature-text {
-  margin: 0;
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-}
+/* NOTE: legacy landing-features styles removed.
+   They conflicted with the newer "Features Section" styles below, causing the
+   header and the blocks to layout side-by-side (because the <section> became a 3-col grid). */
 
 .landing-footer {
   position: relative;
@@ -1941,11 +1926,11 @@ a {
 .landing-btn--primary {
   background: linear-gradient(180deg, var(--neon-primary) 0%, var(--accent-strong) 100%);
   color: var(--bg-primary);
-  box-shadow: 0 0 40px -10px rgba(0, 229, 255, 0.5);
+  box-shadow: 0 0 40px -10px var(--button-primary-shadow);
 }
 
 .landing-btn--primary:hover {
-  box-shadow: 0 0 60px -10px rgba(0, 229, 255, 0.6);
+  box-shadow: 0 0 60px -10px var(--button-primary-shadow-hover);
 }
 
 .landing-btn--secondary {
@@ -1958,102 +1943,14 @@ a {
 }
 
 /* Showcase Section */
-.landing-showcase {
-  padding: 96px 32px;
-}
-
-.landing-showcase-inner {
-  max-width: 1120px;
-  margin: 0 auto;
-  position: relative;
-  border-radius: 48px;
-  overflow: hidden;
-  background: var(--surface-container-high);
-  padding: 32px;
-  box-shadow: inset 0 0 0 1px rgba(195, 245, 255, 0.1);
-}
-
-@media (min-width: 768px) {
-  .landing-showcase-inner {
-    padding: 64px;
-  }
-}
-
-.landing-showcase-gradient {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, var(--surface-container-high) 0%, transparent 100%);
-  z-index: 10;
-  pointer-events: none;
-}
-
-.landing-showcase-image {
-  width: 100%;
-  height: auto;
-  border-radius: 24px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  border: 1px solid var(--line-soft);
-}
-
-.landing-showcase-card {
-  position: absolute;
-  display: none;
-  background: rgba(48, 53, 59, 0.4);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(59, 73, 76, 0.3);
-  padding: 24px;
-  border-radius: 24px;
-  max-width: 280px;
-  z-index: 20;
-}
-
-@media (min-width: 768px) {
-  .landing-showcase-card {
-    display: block;
-    bottom: 80px;
-    right: 80px;
-  }
-}
-
-.landing-showcase-status {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.landing-showcase-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 999px;
-  background: var(--primary-container);
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-.landing-showcase-status span {
-  font-size: 0.625rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--primary-fixed);
-}
-
-.landing-showcase-card p {
-  font-size: 0.875rem;
-  font-style: italic;
-  color: var(--text-primary);
-}
+/* (removed) */
 
 /* Features Section */
 .landing-features {
   padding: 96px 32px;
-  background: var(--bg-primary);
+  background: var(--bg-secondary);
+  /* Ensure header stays ABOVE the blocks (not side-by-side due to any stray grid styles). */
+  display: block;
 }
 
 .landing-features-header {
@@ -2091,6 +1988,7 @@ a {
   gap: 32px;
   max-width: 1120px;
   margin: 0 auto;
+  justify-items: center;
 }
 
 @media (min-width: 768px) {
@@ -2100,15 +1998,20 @@ a {
 }
 
 .landing-feature {
-  background: rgba(48, 53, 59, 0.4);
+  background: var(--surface-primary);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border-radius: 24px;
+  /* More "squared" cards (less pill-like) */
+  border-radius: 16px;
   padding: 40px;
-  box-shadow: inset 0 0 0 1px rgba(195, 245, 255, 0.1);
+  box-shadow: inset 0 0 0 1px var(--line-soft);
   display: flex;
   flex-direction: column;
   gap: 24px;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  max-width: 340px;
   transition: transform 0.5s ease;
 }
 
@@ -2120,7 +2023,7 @@ a {
   width: 56px;
   height: 56px;
   border-radius: 12px;
-  background: rgba(0, 229, 255, 0.1);
+  background: var(--accent-soft);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2344,10 +2247,11 @@ a {
   height: 24px;
 }
 
-/* Theme-based icon colors */
+/* Landing icons: colors are baked into the SVG (see src/branding/zenaiMark.ts).
+   IMPORTANT: do not hue-rotate these, or the sunset (orange) mark turns purple. */
 [data-theme="sunset"] .landing-brand-icon,
 [data-theme="sunset"] .landing-footer-icon {
-  filter: hue-rotate(-120deg) saturate(1.3) brightness(1.1);
+  filter: none;
 }
 
 /* Theme Toggle */
