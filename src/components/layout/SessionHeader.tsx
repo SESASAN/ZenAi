@@ -19,7 +19,9 @@ export function SessionHeader({ onOpenSidebar }: SessionHeaderProps) {
           onClick={onOpenSidebar}
           aria-label="Open navigation"
         >
-          <span aria-hidden="true">☰</span>
+          <span className="material-symbols-outlined" aria-hidden="true">
+            menu
+          </span>
         </button>
       </div>
     </header>

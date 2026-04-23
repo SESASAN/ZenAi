@@ -53,7 +53,9 @@ export function SideNav({
             onClick={onClose}
             aria-label="Close navigation"
           >
-            ×
+            <span className="material-symbols-outlined" aria-hidden="true">
+              close
+            </span>
           </button>
         </div>
 
@@ -90,13 +92,16 @@ export function SideNav({
                     <span className="sideNav__conversationTitle">{conversation.title}</span>
                     <span className="sideNav__conversationPreview">{preview}</span>
                   </button>
+
                   <button
                     className="sideNav__deleteButton"
                     type="button"
                     onClick={() => onDeleteConversation(conversation.id)}
                     aria-label="Delete chat"
                   >
-                    🗑
+                    <span className="material-symbols-outlined" aria-hidden="true">
+                      delete
+                    </span>
                   </button>
                 </div>
               )
@@ -139,3 +144,4 @@ export function SideNav({
     </>
   )
 }
+

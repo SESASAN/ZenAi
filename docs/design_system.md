@@ -94,8 +94,8 @@ Elementos interactivos deben tener glow sutil:
 
 ### Fuente Principal
 
-- 'Orbitron', sans-serif (preferida para estética Tron)
-- Alternativa: 'Inter' o 'Roboto'
+- "Orbitron", sans-serif (preferida para estética Tron)
+- Alternativa: "Inter" o "Roboto"
 
 ### Jerarquía
 
@@ -188,7 +188,7 @@ Sistema 8px:
 - 24px
 - 32px
 
-Mensajes separados por 12px
+Mensajes separados por 12px  
 Padding interno mínimo 16px
 
 ---
@@ -228,3 +228,4 @@ ZenAI representa:
 - Minimalismo futurista
 
 El diseño debe sentirse como una consola digital avanzada del futuro.
+

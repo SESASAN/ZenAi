@@ -444,6 +444,11 @@ a {
   backdrop-filter: blur(12px);
 }
 
+.sessionHeader__menuButton .material-symbols-outlined {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
 .sessionHeader__disc {
   width: 44px;
   height: 44px;
@@ -537,6 +542,11 @@ a {
   background: rgba(255, 255, 255, 0.06);
   color: var(--text-primary);
   cursor: pointer;
+}
+
+.sideNav__close .material-symbols-outlined {
+  font-size: 1.5rem;
+  line-height: 1;
 }
 
 .sideNav__newChat,
@@ -695,6 +705,11 @@ a {
   opacity: 0;
   transition: opacity 0.2s, background 0.2s, color 0.2s;
   cursor: pointer;
+}
+
+.sideNav__deleteButton .material-symbols-outlined {
+  font-size: 1.25rem;
+  line-height: 1;
 }
 
 .sideNav__conversationItem:hover .sideNav__deleteButton {
