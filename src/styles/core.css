@@ -912,6 +912,7 @@ a {
 .composerInput {
   width: 100%;
   min-height: 46px;
+  min-width: 0;
   flex: 1;
   border: 0;
   background: transparent;
@@ -1037,11 +1038,31 @@ a {
     min-height: 44px;
     padding: 10px 10px;
   }
-
-.composerRow button {
-    min-width: 96px;
+ 
+  .composerRow button {
+    min-width: clamp(72px, 22vw, 96px);
     height: 44px;
-    padding: 0 14px;
+    padding: 0 12px;
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .messageList {
+    padding-inline: 14px;
+  }
+
+  .composerDock {
+    padding-inline: 12px;
+  }
+
+  .composerRow {
+    gap: 8px;
+  }
+
+  .composerRow button {
+    min-width: 64px;
+    padding: 0 10px;
   }
 }
 

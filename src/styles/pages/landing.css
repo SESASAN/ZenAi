@@ -778,13 +778,17 @@
 .landing-theme-toggle {
   position: fixed;
   top: 24px;
+  top: calc(24px + env(safe-area-inset-top));
   right: 24px;
+  right: calc(24px + env(safe-area-inset-right));
   z-index: 100;
 }
 
 .landing-theme-toggle {
   top: 24px;
+  top: calc(24px + env(safe-area-inset-top));
   right: 32px;
+  right: calc(32px + env(safe-area-inset-right));
 }
 
 .landing-footer-links {
@@ -827,4 +831,68 @@
 
 .landing-footer-credit-link:hover {
   text-decoration: underline;
+}
+
+/* Responsive fine-tuning (mobile-first hotfixes) */
+@media (max-width: 480px) {
+  .landing-nav-inner {
+    padding: 16px 16px;
+    gap: 12px;
+  }
+
+  .landing-brand {
+    font-size: 1.25rem;
+  }
+
+  .landing-brand-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .landing-nav-cta {
+    padding: 8px 14px;
+    font-size: 0.875rem;
+    border-radius: 10px;
+  }
+
+  .landing-hero {
+    padding-top: 72px;
+  }
+
+  .landing-hero-content {
+    padding: 0 16px;
+  }
+
+  .landing-hero-title {
+    font-size: clamp(2.35rem, 9vw, 3rem);
+  }
+
+  .landing-hero-subtitle {
+    font-size: 1rem;
+    margin-bottom: 32px;
+  }
+
+  .landing-hero-blob--1,
+  .landing-hero-blob--2 {
+    width: min(320px, 80vw);
+    height: min(320px, 80vw);
+    filter: blur(100px);
+  }
+
+  .landing-features,
+  .landing-pricing {
+    padding: 72px 20px;
+  }
+
+  .landing-feature {
+    padding: 28px;
+  }
+
+  .landing-pricing-card {
+    padding: 28px;
+  }
+
+  .landing-footer {
+    padding: 40px 20px;
+  }
 }

@@ -405,3 +405,38 @@
   }
 }
 
+@media (max-width: 480px) {
+  .register-page {
+    padding: 16px;
+  }
+
+  .register-container {
+    gap: 24px;
+  }
+
+  .register-card {
+    padding: 24px;
+    border-radius: 1.75rem;
+  }
+
+  .register-card-header {
+    margin-bottom: 28px;
+  }
+
+  .register-card-title {
+    font-size: 1.6rem;
+  }
+
+  .register-input {
+    padding: 14px 18px;
+  }
+
+  .register-submit {
+    margin-top: 16px;
+  }
+
+  .register-social {
+    grid-template-columns: 1fr;
+  }
+}
+
