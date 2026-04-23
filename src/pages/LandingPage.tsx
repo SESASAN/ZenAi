@@ -48,9 +48,14 @@ export function LandingPage() {
               <Link to="/register" className="landing-btn landing-btn--primary">
                 Enter the Sanctuary
               </Link>
-              <button className="landing-btn landing-btn--secondary">
+              <a
+                className="landing-btn landing-btn--secondary"
+                href="https://github.com/SESASAN/ZenAi"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 View Documentation
-              </button>
+              </a>
             </div>
           </div>
         </section>

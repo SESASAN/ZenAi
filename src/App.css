@@ -39,6 +39,9 @@
   --button-secondary-text: #dff8ff;
   --button-secondary-border: rgba(0, 229, 255, 0.22);
   --button-secondary-border-hover: rgba(0, 229, 255, 0.38);
+  --pricing-featured-border: rgba(0, 229, 255, 0.3);
+  --pricing-featured-glow: rgba(0, 229, 255, 0.2);
+  --pricing-featured-btn-glow: rgba(0, 229, 255, 0.4);
   --error-color: #fca5a5;
 }
 
@@ -82,6 +85,9 @@
   --button-secondary-text: #fff2e6;
   --button-secondary-border: rgba(255, 140, 0, 0.24);
   --button-secondary-border-hover: rgba(255, 140, 0, 0.4);
+  --pricing-featured-border: rgba(255, 140, 0, 0.3);
+  --pricing-featured-glow: rgba(255, 140, 0, 0.24);
+  --pricing-featured-btn-glow: rgba(255, 140, 0, 0.46);
   --error-color: #ffd3b6;
 }
 
@@ -2105,9 +2111,9 @@ a {
 }
 
 .landing-pricing-card--featured {
-  border: 2px solid rgba(0, 229, 255, 0.3);
+  border: 2px solid var(--pricing-featured-border);
   position: relative;
-  box-shadow: 0 0 50px -12px rgba(0, 229, 255, 0.2);
+  box-shadow: 0 0 50px -12px var(--pricing-featured-glow);
 }
 
 .landing-pricing-badge {
@@ -2206,7 +2212,7 @@ a {
 }
 
 .landing-pricing-btn--primary:hover {
-  box-shadow: 0 6px 24px rgba(0, 229, 255, 0.4);
+  box-shadow: 0 6px 24px var(--pricing-featured-btn-glow);
 }
 
 /* Footer */
