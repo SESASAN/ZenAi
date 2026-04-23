@@ -156,7 +156,7 @@ export default function ChatPage({ user }: { user: User }) {
       }
       const message = error instanceof Error
         ? error.message
-        : "No se pudo conectar con el backend del chat."
+        : "Couldn't connect to the chat backend."
 
       setRequestError(message)
       setRetryAfterSeconds(null)
@@ -318,7 +318,7 @@ export default function ChatPage({ user }: { user: User }) {
         <div
           ref={composerDockRef}
           className="composerDock"
-          aria-label="Zona de composición del mensaje"
+          aria-label="Message composer"
         >
           <div className="composerDock__inner">
             <form className="composer" onSubmit={handleSubmit}>
@@ -326,8 +326,8 @@ export default function ChatPage({ user }: { user: User }) {
                 <textarea
                   id="chat-input"
                   className="composerInput"
-                  aria-label="Escribir mensaje"
-                  placeholder="Escribe aquí lo que quieres pedirle al asistente..."
+                  aria-label="Write a message"
+                  placeholder="Type what you want to ask the assistant…"
                   value={inputValue}
                   onChange={(event) => setInputValue(event.target.value)}
                   onKeyDown={handleInputKeyDown}
@@ -335,7 +335,7 @@ export default function ChatPage({ user }: { user: User }) {
                   rows={1}
                 />
                 <SendButton
-                  label={isSending ? "Pensando..." : "Enviar"}
+                  label={isSending ? "Thinking..." : "Send"}
                   disabled={isDisabled}
                   type="submit"
                 />
@@ -343,7 +343,7 @@ export default function ChatPage({ user }: { user: User }) {
 
               {retryAfterSeconds !== null ? (
                 <RateLimitAlert
-                  message={requestError ?? "Se acabaron las peticiones de hoy."}
+                  message={requestError ?? "You've reached today's request limit."}
                   retryAfterSeconds={retryAfterSeconds}
                   onDismiss={() => {
                     setRetryAfterSeconds(null)

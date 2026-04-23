@@ -1,11 +1,12 @@
 import { useEffect } from "react";
 import { getZenaiMarkDataUrl } from "@/branding/zenaiMark";
+import type { ThemeId } from "@/theme/palettes";
 
 const FAVICON_LINK_ID = "zenai-dynamic-favicon";
 
-export function useFavicon(isAltTheme: boolean) {
+export function useFavicon(themeId: ThemeId) {
   useEffect(() => {
-    const dataUrl = getZenaiMarkDataUrl(isAltTheme);
+    const dataUrl = getZenaiMarkDataUrl(themeId);
     
     let faviconLink = document.getElementById(FAVICON_LINK_ID) as HTMLLinkElement | null;
     if (!faviconLink) {
@@ -16,5 +17,5 @@ export function useFavicon(isAltTheme: boolean) {
       document.head.appendChild(faviconLink);
     }
     faviconLink.href = dataUrl;
-  }, [isAltTheme]);
+  }, [themeId]);
 }

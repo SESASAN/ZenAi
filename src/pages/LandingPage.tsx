@@ -4,14 +4,14 @@ import { useTheme } from "@/components/ThemeContext";
 import { getZenaiMarkDataUrl } from "@/branding/zenaiMark";
 
 export function LandingPage() {
-  const { isAltTheme } = useTheme();
+  const { themeId } = useTheme();
 
   return (
     <div className="landing-page">
       <nav className="landing-nav">
         <div className="landing-nav-inner">
           <Link to="/" className="landing-brand">
-            <img alt="ZenAI" src={getZenaiMarkDataUrl(isAltTheme)} className="landing-brand-icon" />
+            <img alt="ZenAI" src={getZenaiMarkDataUrl(themeId)} className="landing-brand-icon" />
             <span>ZenAI</span>
           </Link>
           <div className="landing-nav-links">
@@ -159,7 +159,7 @@ export function LandingPage() {
         <div className="landing-footer-inner">
           <div className="landing-footer-top">
             <Link to="/" className="landing-footer-brand">
-              <img alt="ZenAI" src={getZenaiMarkDataUrl(isAltTheme)} className="landing-footer-icon" />
+              <img alt="ZenAI" src={getZenaiMarkDataUrl(themeId)} className="landing-footer-icon" />
               <span>ZenAI</span>
             </Link>
             <div className="landing-footer-links">

@@ -27,7 +27,7 @@ export class RateLimitError extends Error {
   readonly retryAfterSeconds: number
 
   constructor(retryAfterSeconds: number) {
-    super("Se acabaron las peticiones de hoy. Volvé a intentarlo más tarde.")
+    super("You've reached today's request limit. Please try again later.")
     this.name = "RateLimitError"
     this.retryAfterSeconds = retryAfterSeconds
   }
@@ -62,7 +62,7 @@ export async function sendChatMessage(
       body: JSON.stringify(payload)
     })
   } catch {
-    throw new Error("Conexión Perdida")
+    throw new Error("Connection lost")
   }
 
   const data = (await response.json()) as ChatApiResponse | ChatApiError
@@ -73,7 +73,7 @@ export async function sendChatMessage(
       throw new RateLimitError(errorData.retryAfterSeconds)
     }
     const errorMessage = errorData.error || undefined
-    throw new Error(errorMessage || "No se pudo obtener respuesta del asistente.")
+    throw new Error(errorMessage || "Couldn't get a response from the assistant.")
   }
 
   return data as ChatApiResponse

@@ -51,7 +51,7 @@ export function SideNav({
             className="sideNav__close"
             type="button"
             onClick={onClose}
-            aria-label="Cerrar navegación"
+            aria-label="Close navigation"
           >
             ×
           </button>
@@ -63,19 +63,19 @@ export function SideNav({
           onClick={onCreateConversation}
           disabled={!canCreateConversation}
         >
-          <span aria-hidden="true">＋</span>
+          <span aria-hidden="true">+</span>
           New Chat
         </button>
 
-        <section className="sideNav__conversations" aria-label="Lista de conversaciones">
+        <section className="sideNav__conversations" aria-label="Conversation list">
           <div className="sideNav__conversationsHeader">
-            <p className="sideNav__sectionLabel">Chats</p>
+            <p className="sideNav__sectionLabel">Conversations</p>
           </div>
 
           <div className="sideNav__conversationList">
             {conversations.map((conversation) => {
               const isActive = conversation.id === activeConversationId
-              const preview = conversation.messages.at(-1)?.content ?? "Sin mensajes todavía"
+              const preview = conversation.messages.at(-1)?.content ?? "No messages yet"
 
               return (
                 <div
@@ -94,7 +94,7 @@ export function SideNav({
                     className="sideNav__deleteButton"
                     type="button"
                     onClick={() => onDeleteConversation(conversation.id)}
-                    aria-label="Eliminar chat"
+                    aria-label="Delete chat"
                   >
                     🗑
                   </button>
@@ -121,17 +121,17 @@ export function SideNav({
             </div>
 
             <div className="sideNav__profileCopy">
-              <span className="sideNav__profileName">{userLabel ?? "Invitado"}</span>
+              <span className="sideNav__profileName">{userLabel ?? "Guest"}</span>
             </div>
           </div>
 
           {userLabel ? (
             <button className="sideNav__authButton" type="button" onClick={onSignOut}>
-              Salir
+              Sign out
             </button>
           ) : (
             <button className="sideNav__authButton" type="button" onClick={onSignIn}>
-              Ingresar
+              Sign in
             </button>
           )}
         </div>

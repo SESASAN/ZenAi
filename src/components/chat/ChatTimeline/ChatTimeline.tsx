@@ -16,8 +16,8 @@ export interface ChatTimelineProps {
 }
 
 const DEFAULT_EMPTY_STATE: EmptyStateCopy = {
-  title: "Este chat está vacío",
-  description: "Empezá la conversación con una idea, una pregunta o una tarea para ZenAI."
+  title: "This chat is empty",
+  description: "Start the conversation with an idea, a question, or a task for ZenAI."
 }
 
 export const ChatTimeline = forwardRef<HTMLElement, ChatTimelineProps>(function ChatTimeline(
@@ -34,7 +34,7 @@ export const ChatTimeline = forwardRef<HTMLElement, ChatTimelineProps>(function 
     <section
       ref={ref}
       className="messageList"
-      aria-label="Lista de mensajes"
+      aria-label="Message list"
     >
       <div className="messageList__inner">
         {messages.map((message) => (
@@ -57,7 +57,7 @@ export const ChatTimeline = forwardRef<HTMLElement, ChatTimelineProps>(function 
 
         {isSending && (
           <div className="chatStatusPill" role="status">
-            ZenAI está pensando...
+            ZenAI is thinking...
           </div>
         )}
 

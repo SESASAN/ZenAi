@@ -15,7 +15,7 @@ function getChatStorageKey(uid: string) {
 }
 
 function createConversationTitleFallback() {
-  return "Nuevo chat"
+  return "New chat"
 }
 
 export function createConversation(): ChatConversation {
