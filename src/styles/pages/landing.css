@@ -26,6 +26,20 @@
   margin: 0 auto;
 }
 
+.landing-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Landing theme disc is inside the fixed header, so it should NOT be positioned fixed. */
+.landing-nav .landing-theme-toggle {
+  position: static;
+  top: auto;
+  right: auto;
+  z-index: auto;
+}
+
 .landing-brand {
   font-family: var(--font-headline, Manrope), sans-serif;
   font-size: 1.5rem;
@@ -84,6 +98,13 @@
 
 .landing-nav-cta:active {
   opacity: 0.8;
+}
+
+/* Mobile: hide header CTA ("Get Started") to reduce clutter (keep main CTA in hero). */
+@media (max-width: 640px) {
+  .landing-nav-cta {
+    display: none;
+  }
 }
 
 /* Hero Section */

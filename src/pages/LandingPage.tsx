@@ -18,15 +18,16 @@ export function LandingPage() {
             <a className="landing-nav-link landing-nav-link--active" href="#">Features</a>
             <a className="landing-nav-link" href="#pricing">Pricing</a>
           </div>
-          <Link to="/register" className="landing-nav-cta">
-            Get Started
-          </Link>
+          <div className="landing-nav-actions">
+            <Link to="/register" className="landing-nav-cta">
+              Get Started
+            </Link>
+            <div className="landing-theme-toggle">
+              <ThemeToggle />
+            </div>
+          </div>
         </div>
       </nav>
-
-      <div className="landing-theme-toggle">
-        <ThemeToggle />
-      </div>
 
       <main>
         <section className="landing-hero">

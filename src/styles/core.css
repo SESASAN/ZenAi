@@ -576,6 +576,16 @@ a {
   right: calc(32px + env(safe-area-inset-right));
 }
 
+@media (max-width: 640px) {
+  /* Mobile: bring the theme disc slightly closer to the top edge (still safe-area aware). */
+  .login-theme-toggle,
+  .register-theme-toggle,
+  .landing-theme-toggle {
+    top: 14px;
+    top: calc(14px + env(safe-area-inset-top));
+  }
+}
+
 .sideNavBackdrop {
   position: fixed;
   inset: 0;
