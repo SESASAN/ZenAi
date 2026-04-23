@@ -822,6 +822,16 @@ a {
   opacity: 1;
 }
 
+.sideNav__conversationItem:focus-within .sideNav__deleteButton {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .sideNav__deleteButton {
+    opacity: 1;
+  }
+}
+
 .sideNav__deleteButton:hover {
   background: rgba(255, 80, 80, 0.2);
   color: #ff5050;
