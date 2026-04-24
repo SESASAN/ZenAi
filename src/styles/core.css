@@ -127,6 +127,9 @@
   --message-user-border: rgba(167, 139, 250, 0.25);
   --message-user-text: #fbfaff;
   --message-user-shadow: rgba(167, 139, 250, 0.08);
+  --message-assistant-bg: rgba(26, 18, 51, 0.88);
+  --message-assistant-border: rgba(167, 139, 250, 0.18);
+  --message-assistant-text: var(--text-muted);
 
   /* Shadows / glows */
   --button-primary-shadow: rgba(139, 92, 246, 0.22);
@@ -175,6 +178,9 @@
   --message-user-border: rgba(34, 197, 94, 0.25);
   --message-user-text: #f3fff8;
   --message-user-shadow: rgba(34, 197, 94, 0.08);
+  --message-assistant-bg: rgba(11, 36, 24, 0.88);
+  --message-assistant-border: rgba(34, 197, 94, 0.18);
+  --message-assistant-text: var(--text-muted);
 
   /* Shadows / glows */
   --button-primary-shadow: rgba(34, 197, 94, 0.22);
@@ -221,6 +227,9 @@
   --message-user-border: rgba(239, 68, 68, 0.25);
   --message-user-text: #fff7f8;
   --message-user-shadow: rgba(239, 68, 68, 0.08);
+  --message-assistant-bg: rgba(42, 15, 15, 0.88);
+  --message-assistant-border: rgba(239, 68, 68, 0.18);
+  --message-assistant-text: var(--text-muted);
 
   --button-primary-shadow: rgba(239, 68, 68, 0.22);
   --button-primary-shadow-hover: rgba(239, 68, 68, 0.32);
@@ -266,6 +275,9 @@
   --message-user-border: rgba(251, 191, 36, 0.25);
   --message-user-text: #fffdf2;
   --message-user-shadow: rgba(251, 191, 36, 0.08);
+  --message-assistant-bg: rgba(42, 31, 11, 0.88);
+  --message-assistant-border: rgba(251, 191, 36, 0.18);
+  --message-assistant-text: var(--text-muted);
 
   --button-primary-shadow: rgba(251, 191, 36, 0.22);
   --button-primary-shadow-hover: rgba(251, 191, 36, 0.32);
@@ -312,6 +324,9 @@
   --message-user-border: rgba(226, 232, 240, 0.2);
   --message-user-text: #ffffff;
   --message-user-shadow: rgba(226, 232, 240, 0.06);
+  --message-assistant-bg: rgba(15, 23, 32, 0.88);
+  --message-assistant-border: rgba(226, 232, 240, 0.18);
+  --message-assistant-text: var(--text-muted);
 
   --button-primary-shadow: rgba(203, 213, 225, 0.18);
   --button-primary-shadow-hover: rgba(203, 213, 225, 0.26);
