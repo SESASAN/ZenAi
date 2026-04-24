@@ -33,10 +33,25 @@ export class RateLimitError extends Error {
   }
 }
 
-const DEFAULT_CHAT_API_URL = "http://127.0.0.1:3001"
+/**
+ * Prefer same-origin by default.
+ * - When running via `vercel dev --listen 3001`, the UI and `/chat` are served from the same origin.
+ * - Hardcoding `127.0.0.1` can accidentally make requests cross-origin vs `localhost`,
+ *   triggering CORS/preflight and making failures harder to debug.
+ */
+const DEFAULT_CHAT_API_URL =
+  typeof window !== "undefined" ? window.location.origin : "http://127.0.0.1:3001"
 
 function getChatApiBaseUrl() {
   return import.meta.env.VITE_CHAT_API_URL?.trim() || DEFAULT_CHAT_API_URL
+}
+
+function buildChatEndpoint(baseUrl: string) {
+  const normalized = baseUrl.replace(/\/+$/, "")
+  // Support both styles:
+  // - VITE_CHAT_API_URL=https://<host>           -> use /api/chat
+  // - VITE_CHAT_API_URL=https://<host>/api       -> use /api/chat via /chat suffix
+  return normalized.endsWith("/api") ? `${normalized}/chat` : `${normalized}/api/chat`
 }
 
 export async function sendChatMessage(
@@ -53,7 +68,7 @@ export async function sendChatMessage(
   let response: Response
 
   try {
-    response = await fetch(`${getChatApiBaseUrl()}/chat`, {
+    response = await fetch(buildChatEndpoint(getChatApiBaseUrl()), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -65,7 +80,14 @@ export async function sendChatMessage(
     throw new Error("Connection lost")
   }
 
-  const data = (await response.json()) as ChatApiResponse | ChatApiError
+  // Avoid crashing the UI when the response has an empty body or non-JSON payload (proxy errors, etc).
+  const rawText = await response.text()
+  let data: ChatApiResponse | ChatApiError = {}
+  try {
+    data = rawText ? (JSON.parse(rawText) as ChatApiResponse | ChatApiError) : {}
+  } catch {
+    data = { error: rawText || "Invalid JSON response from server." }
+  }
 
   if (!response.ok) {
     const errorData = data as ChatApiError

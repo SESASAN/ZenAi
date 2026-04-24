@@ -3,6 +3,10 @@
   "framework": null,
   "buildCommand": null,
   "outputDirectory": null,
+  "rewrites": [
+    { "source": "/chat", "destination": "/api/chat" },
+    { "source": "/health", "destination": "/api/health" }
+  ],
   "functions": {
     "api/**/*.ts": {
       "maxDuration": 60

@@ -38,7 +38,7 @@ El frontend vive en `src/` y se encarga de:
 
 ### Backend
 
-El backend vive en `functions/` y concentra:
+El backend canónico vive en `api/` (Vercel) y concentra:
 
 - validación de requests,
 - orquestación del flujo de chat,
@@ -47,8 +47,7 @@ El backend vive en `functions/` y concentra:
 - verificación del token de Firebase (ID token),
 - persistencia de conversaciones en Cloud Firestore.
 
-> Nota: para desarrollo local el backend corre como servidor Node (`functions/src/local-server.ts`).
-> Para despliegue en Firebase se expone como HTTP Function (`functions/src/chat/presentation/http/chat.handler.ts`).
+> Nota: el repo aún contiene `functions/` y un server local legado, pero el runtime canónico es Vercel. Ver ADR: `docs/adr/0001_backend_canonical_runtime_vercel.md`.
 
 ### Principios aplicados
 
@@ -144,11 +143,11 @@ El frontend corre en `http://localhost:5173` (Vite por defecto).
 
 ### Backend local
 
-Desde `functions/`:
+Prod-like con Vercel (mismo handler canónico que en producción):
 
 ```bash
 npm install
-npm run dev:local
+npm run dev:backend
 ```
 
 El backend local queda disponible en:
@@ -157,14 +156,14 @@ El backend local queda disponible en:
 http://localhost:3001
 ```
 
-## Deploy del backend en Vercel (gratis)
+## Backend en Vercel (producción)
 
 Si no querés usar Firebase Functions (por límites/costos de deploy), podés desplegar el backend como **Serverless Functions en Vercel**.
 
 Este repo incluye endpoints compatibles en:
 
-- `POST /api/chat`
-- `GET /api/health`
+- `POST /api/chat` (y rewrite `POST /chat`)
+- `GET /api/health` (y rewrite `GET /health`)
 
 ### Configurar variables en Vercel
 
@@ -193,10 +192,11 @@ Luego pegás ese valor como `FIREBASE_SERVICE_ACCOUNT_JSON` en Vercel.
 En producción, seteá:
 
 ```bash
-VITE_CHAT_API_URL=https://TU-PROYECTO.vercel.app/api
+VITE_CHAT_API_URL=https://TU-PROYECTO.vercel.app
 ```
 
 > Importante: el frontend espera `POST {VITE_CHAT_API_URL}/chat`.
+> Alternativa compatible: `https://TU-PROYECTO.vercel.app/api` (funciona porque existe `POST /api/chat`).
 
 ### Requisitos para que se guarde en Firestore
 

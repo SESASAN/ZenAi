@@ -1,3 +1,11 @@
+/**
+ * LEGACY (no canónico):
+ * Este server local monta la implementación de chat de Firebase Functions.
+ * El runtime canónico del backend ahora es Vercel (`api/*`).
+ *
+ * Fase 2: mantener solo mientras migramos/consolidamos.
+ * Ver: docs/adr/0001_backend_canonical_runtime_vercel.md
+ */
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 
 import { parseChatRequest } from "./chat/application/chat-request.validator.js";

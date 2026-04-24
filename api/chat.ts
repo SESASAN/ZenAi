@@ -2,6 +2,7 @@ import { FieldValue } from "firebase-admin/firestore";
 
 // En runtime ESM (Vercel) las imports relativas necesitan extensión.
 import { adminAuth, adminDb } from "./_shared/firebaseAdmin.js";
+import { withSystemPrompt } from "./_shared/chatSystemPrompt.js";
 
 type RequestLike = {
   method?: string;
@@ -143,7 +144,7 @@ async function callProvider(request: Required<Pick<ChatRequest, "messages">> & C
     },
     body: JSON.stringify({
       model: request.model ?? config.defaultModel,
-      messages: request.messages,
+      messages: withSystemPrompt(request.messages),
       stream: false,
       temperature: request.temperature ?? 0.2,
       ...(request.maxTokens ? { max_tokens: request.maxTokens } : {}),

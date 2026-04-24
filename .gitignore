@@ -28,3 +28,6 @@ dist-ssr
 AGENTS.md
 agents.md
 skills/
+
+.vercel
+.env*.local

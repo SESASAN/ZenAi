@@ -1,3 +1,9 @@
+/**
+ * LEGACY (no canónico):
+ * Handler HTTP para Firebase Functions. El runtime canónico del backend es Vercel (`api/*`).
+ * Fase 2: mantener solo mientras migramos/consolidamos.
+ * Ver: docs/adr/0001_backend_canonical_runtime_vercel.md
+ */
 import { defineSecret } from "firebase-functions/params";
 import { logger } from "firebase-functions";
 import { onRequest } from "firebase-functions/v2/https";
