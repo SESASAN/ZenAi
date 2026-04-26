@@ -45,7 +45,7 @@ ZenAI se construirá en tres fases:
 
 ---
 
-#### CSS3 (Diseño Tron-Inspired y Responsive)
+#### CSS3 (Diseño Neon-Inspired y Responsive)
 **Uso:**
 - Implementar el sistema de diseño definido en `docs/design_system.md`.
 - Construir una UI responsiva mobile-first.
@@ -268,7 +268,7 @@ Integrar un endpoint de chat completions para generar respuestas.
 - `src/hooks/*`
 - `src/services/*`
 - `src/pages/*` (si aplica)
-- `functions/*` (serverless proxy)
+- Backend serverless (`api/*`)
 
 ---
 

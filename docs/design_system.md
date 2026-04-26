@@ -2,7 +2,7 @@
 
 ## 1. Filosofía Visual
 
-ZenAI adopta una estética futurista inspirada en la película Tron.
+ZenAI adopta una estética futurista inspirada en una estética neon/sci‑fi.
 
 El diseño se basa en:
 
@@ -31,7 +31,7 @@ La interfaz debe transmitir:
 
 ---
 
-## 3. Paleta de Colores (Tron Inspired)
+## 3. Paleta de Colores (Neon Inspired)
 
 ### Fondo Base
 
@@ -41,7 +41,7 @@ La interfaz debe transmitir:
 
 ### Colores Neón
 
-- Primario Neón (Azul Tron): #00E5FF
+- Primario Neón (Azul): #00E5FF
 - Secundario Neón (Cian eléctrico): #00BFFF
 - Acento Neón (Violeta digital): #7C3AED
 
@@ -94,7 +94,7 @@ Elementos interactivos deben tener glow sutil:
 
 ### Fuente Principal
 
-- "Orbitron", sans-serif (preferida para estética Tron)
+- "Orbitron", sans-serif (preferida para estética sci‑fi/neon)
 - Alternativa: "Inter" o "Roboto"
 
 ### Jerarquía
@@ -228,4 +228,3 @@ ZenAI representa:
 - Minimalismo futurista
 
 El diseño debe sentirse como una consola digital avanzada del futuro.
-
