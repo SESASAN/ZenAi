@@ -4,6 +4,66 @@
   min-height: 100vh;
   background: var(--bg-primary);
   color: var(--text-primary);
+  isolation: isolate;
+  transition: background-color 320ms ease, color 320ms ease;
+}
+
+.landing-nav,
+.landing-footer,
+.landing-feature,
+.landing-pricing-card {
+  transition: background-color 320ms ease, color 320ms ease, border-color 320ms ease, box-shadow 320ms ease;
+}
+
+.landing-brand,
+.landing-nav-link,
+.landing-footer-links a,
+.landing-hero-gradient,
+.landing-pricing-btn,
+.landing-btn {
+  transition: color 320ms ease, background-color 320ms ease, border-color 320ms ease, box-shadow 320ms ease,
+    opacity 320ms ease, transform 320ms ease, filter 320ms ease;
+}
+
+.landing-nav-link--active {
+  transition: color 320ms ease, border-color 320ms ease;
+}
+
+.landing-neon-lines-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.7;
+  transition: opacity 320ms ease;
+}
+
+.landing-neon-lines-bg__canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.landing-anchor {
+  scroll-margin-top: 96px;
+}
+
+.landing-pricing-disclaimer {
+  margin: 18px 0 0;
+  padding: 0;
+  text-align: center;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  opacity: 0.75;
+}
+
+.landing-page > main,
+.landing-page > footer {
+  position: relative;
+  z-index: 1;
 }
 
 .landing-nav {

@@ -2,12 +2,14 @@ import { Link } from "react-router-dom";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useTheme } from "@/components/ThemeContext";
 import { getZenaiMarkDataUrl } from "@/branding/zenaiMark";
+import { NeonLinesBackground } from "@/components/landing/NeonLinesBackground";
 
 export function LandingPage() {
   const { themeId } = useTheme();
 
   return (
     <div className="landing-page">
+      <NeonLinesBackground />
       <nav className="landing-nav">
         <div className="landing-nav-inner">
           <Link to="/" className="landing-brand">
@@ -16,7 +18,19 @@ export function LandingPage() {
           </Link>
           <div className="landing-nav-links">
             <a className="landing-nav-link landing-nav-link--active" href="#">Features</a>
-            <a className="landing-nav-link" href="#pricing">Pricing</a>
+            <a
+              className="landing-nav-link"
+              href="#pricing"
+              onClick={(ev) => {
+                ev.preventDefault();
+                const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
+                const el = document.getElementById("pricing");
+                if (!el) return;
+                el.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+              }}
+            >
+              Pricing
+            </a>
           </div>
           <div className="landing-nav-actions">
             <Link to="/register" className="landing-nav-cta">
@@ -151,6 +165,10 @@ export function LandingPage() {
                 <Link to="/register" className="landing-pricing-btn landing-pricing-btn--primary">Upgrade to Ultra</Link>
               </div>
             </div>
+
+            <p className="landing-pricing-disclaimer">
+              Pricing is illustrative only — ZenAI doesn’t offer real pricing plans yet; this section is a UI demo that won’t be used.
+            </p>
           </div>
           <div id="pricing" className="landing-anchor" />
         </section>
