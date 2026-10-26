@@ -13,7 +13,7 @@ export function AppRouter() {
   }
 
   return (
-    <Suspense fallback={<div className="login-page" />}>
+    <Suspense fallback={<AppLoadingScreen />}>
       {user ? (
         <PrivateRoutes user={user} />
       ) : (

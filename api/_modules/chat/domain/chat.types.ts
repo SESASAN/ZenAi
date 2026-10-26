@@ -1,19 +1,32 @@
-export type ChatRole = "system" | "user" | "assistant";
+export type ChatRole = "user" | "assistant";
 
 export type ChatMessage = {
   role: ChatRole;
   content: string;
 };
 
+/** Messages sent to the LLM (the system prompt is only added server-side). */
+export type LlmMessage = {
+  role: "system" | ChatRole;
+  content: string;
+};
+
 export type ChatProvider = "groq" | "cerebras";
 
 export type ChatRequest = {
-  provider?: ChatProvider;
-  model?: string;
-  conversationId?: string;
-  temperature?: number;
-  maxTokens?: number;
-  messages?: ChatMessage[];
+  conversationId: string;
+  messages: ChatMessage[];
+  provider: ChatProvider;
+  model: string;
+  temperature: number;
+  maxTokens: number;
+  stream: boolean;
+};
+
+export type ChatUsage = {
+  promptTokens?: number;
+  completionTokens?: number;
+  totalTokens?: number;
 };
 
 export type ChatCompletion = {
@@ -23,10 +36,5 @@ export type ChatCompletion = {
   };
   provider: ChatProvider;
   model: string;
-  usage?: {
-    promptTokens?: number;
-    completionTokens?: number;
-    totalTokens?: number;
-  };
+  usage?: ChatUsage;
 };
-

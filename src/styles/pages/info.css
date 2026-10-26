@@ -1,0 +1,409 @@
+/* ===== About, legal, 404, error and loading ===== */
+.infoPage {
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.prose {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 72px 24px 96px;
+}
+
+.prose__title {
+  margin: 0 0 20px;
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+
+.prose h2 {
+  margin: 56px 0 14px;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  scroll-margin-top: 88px;
+}
+
+.prose p,
+.prose li {
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+
+.prose p {
+  margin: 0 0 14px;
+}
+
+.prose ul {
+  margin: 0 0 14px;
+  padding-left: 20px;
+}
+
+.prose li {
+  margin-bottom: 6px;
+}
+
+.prose strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.prose .prose__lead {
+  font-size: 19px;
+  color: var(--text);
+}
+
+.pending {
+  color: var(--warning);
+}
+
+.flow {
+  margin-top: 24px;
+}
+
+.flow__row {
+  display: flex;
+  gap: 12px;
+}
+
+.flow__node {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--surface-soft);
+}
+
+.flow__node strong {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.flow__node span {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-2);
+}
+
+.flow__node--accent {
+  border-color: var(--accent-border);
+}
+
+.flow__arrow {
+  flex: none;
+  align-self: center;
+  color: var(--text-disabled);
+}
+
+.flow__below {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.flow__below .flow__node {
+  flex: 0 1 280px;
+  text-align: center;
+}
+
+.specList {
+  margin: 0;
+}
+
+.specList__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line-row);
+  font-size: 15px;
+}
+
+.specList__row:last-child {
+  border-bottom: 0;
+}
+
+.specList dt {
+  color: var(--text-2);
+}
+
+.specList dd {
+  margin: 0;
+}
+
+.openSource {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-top: 56px;
+  padding: 24px;
+  border-radius: var(--radius-xl);
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+}
+
+.openSource > div {
+  flex: 1;
+}
+
+.openSource .openSource__title {
+  margin: 0;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.openSource .openSource__desc {
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-2);
+}
+
+.legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 64px;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.legal__toc {
+  position: sticky;
+  top: 88px;
+  align-self: flex-start;
+  flex: 1 1 200px;
+  max-width: 220px;
+  padding-top: 80px;
+}
+
+.legal__tocTitle {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-3);
+}
+
+.legal__toc a {
+  display: block;
+  padding: 6px 0;
+  color: var(--text-2);
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.legal__toc a:hover {
+  color: var(--text);
+}
+
+.legal__body {
+  flex: 999 1 520px;
+  min-width: 0;
+  margin: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.prose .legal__updated {
+  font-size: 14px;
+  color: var(--text-3);
+}
+
+/* Status pages: 404, error */
+.statusPage {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--bg);
+}
+
+.statusPage__header {
+  display: flex;
+  align-items: center;
+  height: 64px;
+  padding: 0 32px;
+}
+
+.statusPage__main {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 24px 96px;
+}
+
+.statusPage__main--center {
+  flex-direction: column;
+  gap: 16px;
+  text-align: center;
+}
+
+.statusPage__card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 480px;
+}
+
+.statusPage__badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+  color: var(--danger);
+}
+
+.statusPage__code {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-3);
+}
+
+.statusPage__title {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+.statusPage__desc {
+  margin: 0;
+  max-width: 44ch;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-2);
+}
+
+.statusPage__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.statusPage__actions--start {
+  justify-content: flex-start;
+  margin-top: 4px;
+}
+
+.statusPage__details {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line-row);
+  font-size: 14px;
+  color: var(--text-2);
+}
+
+.statusPage__details summary {
+  cursor: pointer;
+}
+
+.statusPage__details pre {
+  margin: 12px 0;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+  border: 1px solid var(--line-row);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  white-space: pre-wrap;
+}
+
+.loadingScreen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--bg);
+}
+
+.loadingScreen__mark {
+  animation: enso-spin 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.loadingScreen__text {
+  font-size: 15px;
+  color: var(--text-2);
+}
+
+@keyframes enso-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 860px) {
+  .legal {
+    gap: 0;
+  }
+
+  .legal__toc {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .prose {
+    padding: 48px 20px 64px;
+  }
+
+  .prose__title {
+    font-size: 32px;
+  }
+
+  .prose .prose__lead {
+    font-size: 17px;
+  }
+
+  .flow__row {
+    flex-direction: column;
+  }
+
+  .flow__arrow {
+    transform: rotate(90deg);
+  }
+
+  .flow__below .flow__node {
+    flex-basis: auto;
+    width: 100%;
+  }
+
+  .openSource {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .statusPage__header {
+    padding: 0 20px;
+  }
+
+  .statusPage__title {
+    font-size: 28px;
+  }
+
+  .statusPage__main--center .statusPage__actions {
+    flex-direction: column;
+    align-self: stretch;
+  }
+}

@@ -1,53 +1,105 @@
-import type { ChatMessage, ChatRequest } from "../domain/chat.types.js";
+import { CHAT_LIMITS, CONVERSATION_ID_PATTERN, DEFAULT_PROVIDER, PROVIDER_MODELS } from "../domain/chat.limits.js";
 import { ChatValidationError } from "../domain/chat.errors.js";
+import type { ChatMessage, ChatProvider, ChatRequest } from "../domain/chat.types.js";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-export function parseChatRequest(
-  body: unknown,
-): Required<Pick<ChatRequest, "messages" | "conversationId">> & ChatRequest {
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function parseBody(body: unknown): unknown {
+  if (typeof body !== "string") return body;
+  try {
+    return JSON.parse(body);
+  } catch {
+    throw new ChatValidationError("The request body must be valid JSON.");
+  }
+}
+
+export function parseChatRequest(rawBody: unknown): ChatRequest {
+  const body = parseBody(rawBody);
   if (!isRecord(body)) {
-    throw new ChatValidationError("El body debe ser un objeto JSON.");
+    throw new ChatValidationError("The request body must be a JSON object.");
   }
 
-  const conversationId = body.conversationId;
-  const messages = body.messages;
-
-  if (typeof conversationId !== "string" || conversationId.trim().length === 0) {
-    throw new ChatValidationError("Falta `conversationId`.");
+  const conversationId = typeof body.conversationId === "string" ? body.conversationId.trim() : "";
+  if (!CONVERSATION_ID_PATTERN.test(conversationId)) {
+    throw new ChatValidationError("`conversationId` is missing or invalid.");
   }
 
-  if (!Array.isArray(messages) || messages.length === 0) {
-    throw new ChatValidationError("`messages` debe ser un arreglo con al menos un mensaje.");
+  const rawMessages = body.messages;
+  if (!Array.isArray(rawMessages) || rawMessages.length === 0) {
+    throw new ChatValidationError("`messages` must be a non-empty array.");
+  }
+  if (rawMessages.length > CHAT_LIMITS.maxMessages) {
+    throw new ChatValidationError(`Too many messages (max ${CHAT_LIMITS.maxMessages}).`);
   }
 
-  const normalizedMessages: ChatMessage[] = messages.map((m) => {
-    const candidate = isRecord(m) ? m : {};
-    return {
-      role: candidate.role as ChatMessage["role"],
-      content: typeof candidate.content === "string" ? candidate.content.trim() : "",
-    };
+  let totalChars = 0;
+  const messages: ChatMessage[] = rawMessages.map((raw) => {
+    const candidate = isRecord(raw) ? raw : {};
+    const role = candidate.role;
+    const content = typeof candidate.content === "string" ? candidate.content.trim() : "";
+
+    if (role === "system") {
+      throw new ChatValidationError("System messages are not allowed.");
+    }
+    if (role !== "user" && role !== "assistant") {
+      throw new ChatValidationError("Each message needs a valid `role` (user or assistant).");
+    }
+    if (content.length === 0) {
+      throw new ChatValidationError("Messages can't be empty.");
+    }
+    if (content.length > CHAT_LIMITS.maxMessageChars) {
+      throw new ChatValidationError(`Each message can have at most ${CHAT_LIMITS.maxMessageChars} characters.`);
+    }
+
+    totalChars += content.length;
+    return { role, content };
   });
 
-  const validRoles = new Set(["system", "user", "assistant"]);
-  if (normalizedMessages.some((m) => !validRoles.has(m.role) || m.content.length === 0)) {
-    throw new ChatValidationError("Cada mensaje debe tener `role` válido y `content` no vacío.");
+  if (totalChars > CHAT_LIMITS.maxTotalChars) {
+    throw new ChatValidationError("The conversation is too long to send in a single request.");
+  }
+  if (messages.at(-1)?.role !== "user") {
+    throw new ChatValidationError("The last message must come from the user.");
   }
 
-  const provider = body.provider;
-  const model = body.model;
-  const temperature = body.temperature;
-  const maxTokens = body.maxTokens;
+  let provider: ChatProvider = DEFAULT_PROVIDER;
+  if (body.provider !== undefined) {
+    if (body.provider !== "groq" && body.provider !== "cerebras") {
+      throw new ChatValidationError("Unsupported provider.");
+    }
+    provider = body.provider;
+  }
+
+  const allowedModels = PROVIDER_MODELS[provider];
+  let model = allowedModels[0];
+  if (body.model !== undefined) {
+    if (typeof body.model !== "string" || !allowedModels.includes(body.model)) {
+      throw new ChatValidationError(`Unsupported model for ${provider}.`);
+    }
+    model = body.model;
+  }
+
+  const temperature = typeof body.temperature === "number" && Number.isFinite(body.temperature)
+    ? clamp(body.temperature, CHAT_LIMITS.minTemperature, CHAT_LIMITS.maxTemperature)
+    : CHAT_LIMITS.defaultTemperature;
+
+  const maxTokens = typeof body.maxTokens === "number" && Number.isFinite(body.maxTokens)
+    ? clamp(Math.floor(body.maxTokens), 1, CHAT_LIMITS.maxTokensCap)
+    : CHAT_LIMITS.defaultMaxTokens;
 
   return {
-    conversationId: conversationId.trim(),
-    messages: normalizedMessages,
-    provider: provider === "cerebras" ? "cerebras" : provider === "groq" ? "groq" : undefined,
-    model: typeof model === "string" ? model : undefined,
-    temperature: typeof temperature === "number" ? temperature : undefined,
-    maxTokens: typeof maxTokens === "number" ? maxTokens : undefined,
+    conversationId,
+    messages,
+    provider,
+    model,
+    temperature,
+    maxTokens,
+    stream: body.stream === true,
   };
 }
-

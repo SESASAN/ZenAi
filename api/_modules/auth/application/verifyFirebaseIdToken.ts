@@ -1,16 +1,12 @@
-import { adminAuth } from "../../../_shared/firebaseAdmin.js";
+import { getAdminAuth } from "../../../_shared/firebaseAdmin.js";
 import { InvalidTokenError } from "../domain/auth.errors.js";
+import type { VerifiedUser } from "../domain/auth.types.js";
 
-type DecodedToken = {
-  uid: string;
-};
-
-export async function verifyFirebaseIdToken(idToken: string): Promise<DecodedToken> {
+export async function verifyFirebaseIdToken(idToken: string): Promise<VerifiedUser> {
   try {
-    const decoded = await adminAuth.verifyIdToken(idToken);
+    const decoded = await getAdminAuth().verifyIdToken(idToken);
     return { uid: decoded.uid };
   } catch {
     throw new InvalidTokenError();
   }
 }
-

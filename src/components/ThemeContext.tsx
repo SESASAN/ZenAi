@@ -1,28 +1,32 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
-import { isThemeId, type ThemeId, THEME_PALETTES } from "@/theme/palettes";
+import { useState, useEffect, type ReactNode } from "react";
+import { DEFAULT_THEME_ID, isThemeId, type ThemeId, THEME_PALETTES } from "@/theme/palettes";
+import { ThemeContext } from "./themeContext";
 
 const THEME_KEY = "zenai-theme";
 
-interface ThemeContextValue {
-  themeId: ThemeId;
-  setThemeId: (themeId: ThemeId) => void;
-  palettes: typeof THEME_PALETTES;
-}
-
-const ThemeContext = createContext<ThemeContextValue | null>(null);
-
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [themeId, setThemeId] = useState<ThemeId>(() => {
-    if (typeof window === "undefined") return "neon";
+function readStoredTheme(): ThemeId {
+  try {
     const raw = localStorage.getItem(THEME_KEY);
     if (raw && isThemeId(raw)) return raw;
-    return "neon";
-  });
+  } catch {
+    // Storage unavailable (private mode, blocked cookies...).
+  }
+  return DEFAULT_THEME_ID;
+}
+
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [themeId, setThemeId] = useState<ThemeId>(() =>
+    typeof window === "undefined" ? DEFAULT_THEME_ID : readStoredTheme(),
+  );
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", themeId);
     document.body.setAttribute("data-theme", themeId);
-    localStorage.setItem(THEME_KEY, themeId);
+    try {
+      localStorage.setItem(THEME_KEY, themeId);
+    } catch {
+      // ignore
+    }
   }, [themeId]);
 
   return (
@@ -30,12 +34,4 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       {children}
     </ThemeContext.Provider>
   );
-}
-
-export function useTheme() {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error("useTheme must be used within a ThemeProvider");
-  }
-  return context;
 }

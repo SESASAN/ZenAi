@@ -15,17 +15,18 @@ function isUserMessage(message: Message): message is UserMessageModel {
 
 interface ChatMessageProps {
   message: Message
+  isStreaming?: boolean
   userInitial?: string
   userAvatarUrl?: string | null
 }
 
-export function ChatMessage({ message, userInitial, userAvatarUrl }: ChatMessageProps) {
+export function ChatMessage({ message, isStreaming = false }: ChatMessageProps) {
   if (isAssistantMessage(message)) {
-    return <AssistantMessage message={message} />
+    return <AssistantMessage message={message} isStreaming={isStreaming} />
   }
 
   if (isUserMessage(message)) {
-    return <UserMessage message={message} userInitial={userInitial} userAvatarUrl={userAvatarUrl} />
+    return <UserMessage message={message} />
   }
 
   return null

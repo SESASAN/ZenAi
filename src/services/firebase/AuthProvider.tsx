@@ -2,6 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import type { User } from "firebase/auth";
 
 import {
+  deleteCurrentUser,
+  sendPasswordReset,
+  updateDisplayName,
   signInWithEmail,
   signInWithGithub,
   signInWithGoogle,
@@ -42,6 +45,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       },
       signOut: async () => {
         await signOutUser();
+      },
+      sendPasswordReset: async (email: string) => {
+        await sendPasswordReset(email);
+      },
+      updateDisplayName: async (displayName: string) => {
+        await updateDisplayName(displayName);
+      },
+      deleteAccount: async () => {
+        await deleteCurrentUser();
       },
     }),
     [user, isLoading],

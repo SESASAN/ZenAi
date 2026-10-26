@@ -1,7 +1,7 @@
 export type MessageRole = "user" | "assistant"
 
 export interface Message {
-    id: number
+    id: string
     content: string
     role: MessageRole
 }

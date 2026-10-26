@@ -1,36 +1,20 @@
-function applyCors(res: { setHeader(name: string, value: string): void }) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-}
+import { applyCorsHeaders } from "./_modules/shared/http/cors.js";
+import { sendJson, sendNoContent } from "./_modules/shared/http/json.js";
+import type { HttpRequest, HttpResponse } from "./_modules/shared/http/types.js";
 
-type RequestLike = {
-  method?: string;
-};
-
-type ResponseLike = {
-  statusCode: number;
-  setHeader(name: string, value: string): void;
-  end(body?: string): void;
-};
-
-export default async function handler(req: RequestLike, res: ResponseLike) {
-  applyCors(res);
-
+export default async function handler(req: HttpRequest, res: HttpResponse) {
+  if (!applyCorsHeaders(req, res, "GET, OPTIONS")) {
+    sendJson(res, 403, { error: "Origin not allowed." });
+    return;
+  }
   if (req.method === "OPTIONS") {
-    res.statusCode = 204;
-    res.end();
+    sendNoContent(res);
     return;
   }
-
   if (req.method !== "GET") {
-    res.statusCode = 405;
-    res.setHeader("Content-Type", "application/json; charset=utf-8");
-    res.end(JSON.stringify({ error: "Method Not Allowed" }));
+    sendJson(res, 405, { error: "Method Not Allowed" });
     return;
   }
 
-  res.statusCode = 200;
-  res.setHeader("Content-Type", "application/json; charset=utf-8");
-  res.end(JSON.stringify({ ok: true, service: "zenai-vercel-backend" }));
+  sendJson(res, 200, { ok: true, service: "zenai-vercel-backend" });
 }

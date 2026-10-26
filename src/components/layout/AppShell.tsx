@@ -1,25 +1,21 @@
 import type { ReactNode } from "react"
-import { AmbientBackground } from "@/components/layout/AmbientBackground"
 
 interface AppShellProps {
   sidebar: ReactNode
   header: ReactNode
   children: ReactNode
+  /** While the mobile drawer is open, the page behind it can't be focused or clicked. */
+  isSidebarOpen?: boolean
 }
 
-export function AppShell({ sidebar, header, children }: AppShellProps) {
+export function AppShell({ sidebar, header, children, isSidebarOpen = false }: AppShellProps) {
   return (
     <div className="appShell">
-      <AmbientBackground />
-
-      <div className="appShell__layout">
-        {sidebar}
-
-        <main className="appShell__main">
-          {header}
-          {children}
-        </main>
-      </div>
+      {sidebar}
+      <main className="appShell__main" inert={isSidebarOpen}>
+        {header}
+        {children}
+      </main>
     </div>
   )
 }

@@ -7,23 +7,30 @@ export type ThemeId =
   | "yellow"
   | "white";
 
-export interface ThemePalette {
+export type ThemePalette = {
   id: ThemeId;
   label: string;
-  /** Used only for the palette UI swatch (not the actual CSS tokens). */
+  /** Accent color. Must match the `[data-theme]` rule in styles/tokens.css. */
   swatch: string;
-}
+};
 
+/** The ground is always neutral; each theme only changes the accent color. */
 export const THEME_PALETTES: ThemePalette[] = [
-  { id: "neon", label: "Neon", swatch: "#00e5ff" },
-  { id: "sunset", label: "Sunset", swatch: "#ff8c00" },
-  { id: "violet", label: "Violet", swatch: "#a78bfa" },
-  { id: "emerald", label: "Emerald", swatch: "#22c55e" },
-  { id: "red", label: "Red", swatch: "#ef4444" },
-  { id: "yellow", label: "Yellow", swatch: "#fbbf24" },
-  { id: "white", label: "White", swatch: "#e5e7eb" },
+  { id: "emerald", label: "Jade", swatch: "#5bc8a6" },
+  { id: "neon", label: "Cian", swatch: "#5cc3d6" },
+  { id: "violet", label: "Violeta", swatch: "#a78bfa" },
+  { id: "sunset", label: "Atardecer", swatch: "#e39a55" },
+  { id: "red", label: "Rojo", swatch: "#e07a7a" },
+  { id: "yellow", label: "Amarillo", swatch: "#e3c064" },
+  { id: "white", label: "Gris", swatch: "#d4d4d8" },
 ];
+
+export const DEFAULT_THEME_ID: ThemeId = "emerald";
 
 export function isThemeId(value: string): value is ThemeId {
   return THEME_PALETTES.some((t) => t.id === value);
+}
+
+export function getAccent(themeId: ThemeId) {
+  return THEME_PALETTES.find((t) => t.id === themeId)?.swatch ?? THEME_PALETTES[0]!.swatch;
 }

@@ -1,168 +1,70 @@
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useLayoutEffect, useRef, useState } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
 import type { User } from "firebase/auth"
 
-import type { Message } from "@/components/MessageBubble"
-import { SendButton } from "@/components/SendButton"
+import { SendButton, SEND_BUTTON_LABELS } from "@/components/SendButton"
 import { ChatTimeline } from "@/components/chat/ChatTimeline"
 import { AppShell } from "@/components/layout/AppShell"
-import { SessionHeader } from "@/components/layout/SessionHeader"
+import { SessionHeader, type ConnectionStatus } from "@/components/layout/SessionHeader"
 import { SideNav } from "@/components/layout/SideNav"
 import { RateLimitAlert } from "@/components/RateLimitAlert"
+import { Icon } from "@/components/ui/Icon"
 import { useAuth } from "@/services/firebase/useAuth"
-import { sendChatMessage, RateLimitError } from "@/services/chat/chatApi"
-import {
-  buildConversationTitle,
-  createConversation,
-  loadConversations,
-  saveConversations,
-  type ChatConversation
-} from "@/services/chat/chatStorage"
+import { useChat } from "@/hooks/useChat"
+import { useOnlineStatus } from "@/hooks/useOnlineStatus"
+import { CLIENT_LIMITS } from "@/services/chat/chatApi"
+import { savePreferredModel } from "@/services/chat/models"
+
+const NEAR_BOTTOM_PX = 160
+const MAX_COMPOSER_HEIGHT = 220
 
 export default function ChatPage({ user }: { user: User }) {
-  const uid = user.uid
+  const userLabel = user.displayName ?? user.email ?? null
   const userInitial = (user.displayName ?? user.email ?? "U").trim().slice(0, 1).toUpperCase()
   const userAvatarUrl = user.photoURL ?? null
-  const { signIn, signOut } = useAuth()
-  const [conversations, setConversations] = useState<ChatConversation[]>([])
-  const [activeConversationId, setActiveConversationId] = useState<string | null>(null)
+  const { signOut } = useAuth()
+  const chat = useChat(user)
+  const isOnline = useOnlineStatus()
   const [inputValue, setInputValue] = useState("")
-  const [isSending, setIsSending] = useState(false)
-  const [requestError, setRequestError] = useState<string | null>(null)
-  const [retryAfterSeconds, setRetryAfterSeconds] = useState<number | null>(null)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const messageListRef = useRef<HTMLElement | null>(null)
-  const composerDockRef = useRef<HTMLDivElement | null>(null)
+  const inputRef = useRef<HTMLTextAreaElement | null>(null)
   const shouldScrollOnNextUserMessageRef = useRef(false)
 
-  const activeConversation = useMemo(
-    () => conversations.find((conversation) => conversation.id === activeConversationId) ?? null,
-    [conversations, activeConversationId]
-  )
-
-  const messages = useMemo(
-    () => activeConversation?.messages ?? [],
-    [activeConversation]
-  )
-
-  const isDisabled = useMemo(
-    () => inputValue.trim().length === 0 || isSending,
-    [inputValue, isSending]
-  )
-
-  const sortedConversations = useMemo(
-    () => [...conversations].sort((a, b) => b.updatedAt - a.updatedAt),
-    [conversations]
-  )
+  const { messages, isSending, activeConversationId } = chat
+  const location = useLocation()
+  const navigate = useNavigate()
+  const requestedConversationId = (location.state as { conversationId?: string } | null)?.conversationId ?? null
+  const visibleMessages = messages.filter((message) => message.content.length > 0)
+  const isRateLimited = chat.error?.retryAfterSeconds !== undefined
+  const isDisabled = inputValue.trim().length === 0 || isSending || chat.isLoadingActive || isRateLimited
 
   const scrollTimelineToBottom = (behavior: ScrollBehavior = "auto") => {
     const messageListElement = messageListRef.current
-
-    if (!messageListElement) {
-      return
-    }
+    if (!messageListElement) return
 
     const endSentinel = messageListElement.querySelector("[data-chat-end]") as HTMLElement | null
-
-    if (endSentinel) {
-      endSentinel.scrollIntoView({
-        block: "end",
-        behavior
-      })
-    }
-
-    const top = messageListElement.scrollHeight
+    endSentinel?.scrollIntoView?.({ block: "end", behavior })
 
     try {
-      messageListElement.scrollTo({
-        top,
-        behavior
-      })
+      messageListElement.scrollTo({ top: messageListElement.scrollHeight, behavior })
     } catch {
-      messageListElement.scrollTop = top
+      messageListElement.scrollTop = messageListElement.scrollHeight
     }
-  }
-
-  const handleCreateConversation = () => {
-    const newConversation = createConversation()
-
-    setConversations((prev) => [newConversation, ...prev])
-    setActiveConversationId(newConversation.id)
-    setInputValue("")
-    setRequestError(null)
-    setIsSidebarOpen(false)
   }
 
   const handleSend = async () => {
-    if (!activeConversation) {
-      return
-    }
+    const value = inputValue.trim()
+    if (!value || isSending || isRateLimited) return
 
-    const trimmedValue = inputValue.trim()
-
-    if (!trimmedValue) return
-
-    const userMessage: Message = {
-      id: Date.now(),
-      role: "user",
-      content: trimmedValue
-    }
-
-    const nextMessages = [...activeConversation.messages, userMessage]
-    const updatedConversation: ChatConversation = {
-      ...activeConversation,
-      title: activeConversation.messages.length === 0
-        ? buildConversationTitle(trimmedValue)
-        : activeConversation.title,
-      messages: nextMessages,
-      updatedAt: Date.now()
-    }
-
-    setRequestError(null)
     shouldScrollOnNextUserMessageRef.current = true
-    setConversations((prev) => prev.map((conversation) => (
-      conversation.id === activeConversation.id ? updatedConversation : conversation
-    )))
     setInputValue("")
-
-    try {
-      setIsSending(true)
-
-      const idToken = await user.getIdToken()
-      const response = await sendChatMessage(nextMessages, activeConversation.id, idToken)
-
-      const assistantMessage: Message = {
-        id: Date.now() + 1,
-        role: "assistant",
-        content: response.message.content
-      }
-
-      setConversations((prev) => prev.map((conversation) => {
-        if (conversation.id !== activeConversation.id) {
-          return conversation
-        }
-
-        return {
-          ...conversation,
-          messages: [...updatedConversation.messages, assistantMessage],
-          updatedAt: Date.now()
-        }
-      }))
-    } catch (error) {
-      if (error instanceof RateLimitError) {
-        setRequestError(error.message)
-        setRetryAfterSeconds(error.retryAfterSeconds)
-        setIsSending(false)
-        return
-      }
-      const message = error instanceof Error
-        ? error.message
-        : "Couldn't connect to the chat backend."
-
-      setRequestError(message)
-      setRetryAfterSeconds(null)
-    } finally {
-      setIsSending(false)
+    const sent = await chat.sendMessage(value)
+    if (!sent) {
+      // Give the user their text back so they can retry.
+      setInputValue((current) => current || value)
     }
+    inputRef.current?.focus()
   }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -170,193 +72,210 @@ export default function ChatPage({ user }: { user: User }) {
     await handleSend()
   }
 
-  const handleInputKeyDown = async (
-    event: React.KeyboardEvent<HTMLTextAreaElement>
-  ) => {
-    if (event.key !== "Enter" || event.shiftKey) {
-      return
-    }
-
+  const handleInputKeyDown = async (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key !== "Enter" || event.shiftKey || event.nativeEvent.isComposing) return
     event.preventDefault()
     await handleSend()
   }
 
-  useEffect(() => {
-    const dockElement = composerDockRef.current
-
-    if (!dockElement) {
-      return
-    }
-
-    const updateDockHeight = () => {
-      const height = dockElement.offsetHeight
-      document.documentElement.style.setProperty("--composerDockHeight", `${height}px`)
-    }
-
-    updateDockHeight()
-
-    const handleResize = () => updateDockHeight()
-    window.addEventListener("resize", handleResize)
-
-    let resizeObserver: ResizeObserver | null = null
-
-    if ("ResizeObserver" in window) {
-      resizeObserver = new ResizeObserver(() => updateDockHeight())
-      resizeObserver.observe(dockElement)
-    }
-
-    return () => {
-      window.removeEventListener("resize", handleResize)
-      resizeObserver?.disconnect()
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!uid) {
-      setConversations([])
-      setActiveConversationId(null)
-      setInputValue("")
-      setRequestError(null)
-      return
-    }
-
-    const storedConversations = loadConversations(uid)
-    const nextConversations = storedConversations.length > 0
-      ? storedConversations
-      : [createConversation()]
-
-    setConversations(nextConversations)
-    setActiveConversationId(nextConversations[0]?.id ?? null)
-    setInputValue("")
-    setRequestError(null)
-    setRetryAfterSeconds(null)
-  }, [uid])
-
-  useEffect(() => {
-    if (!uid) {
-      return
-    }
-
-    saveConversations(uid, conversations)
-  }, [conversations, uid])
-
-  useEffect(() => {
-    if (!activeConversationId && conversations[0]) {
-      setActiveConversationId(conversations[0].id)
-      return
-    }
-
-    if (activeConversationId && !conversations.some((conversation) => conversation.id === activeConversationId)) {
-      setActiveConversationId(conversations[0]?.id ?? null)
-    }
-  }, [conversations, activeConversationId])
-
-  useEffect(() => {
-    if (!shouldScrollOnNextUserMessageRef.current) {
-      return
-    }
-
-    const lastMessage = messages.at(-1)
-
-    if (!lastMessage || lastMessage.role !== "user") {
-      return
-    }
-
-    shouldScrollOnNextUserMessageRef.current = false
-
+  const handleSuggestion = (prompt: string) => {
+    setInputValue(prompt)
     window.requestAnimationFrame(() => {
-      scrollTimelineToBottom("auto")
+      const input = inputRef.current
+      if (!input) return
+      input.focus()
+      input.setSelectionRange(prompt.length, prompt.length)
     })
-  }, [messages])
+  }
+
+  // Grow the composer with its content, up to a limit.
+  useLayoutEffect(() => {
+    const input = inputRef.current
+    if (!input) return
+    input.style.height = "auto"
+    input.style.height = `${Math.min(input.scrollHeight, MAX_COMPOSER_HEIGHT)}px`
+  }, [inputValue])
+
+  // Open the conversation picked in the history page, then clear the request.
+  const { selectConversation, conversations } = chat
+  useEffect(() => {
+    if (!requestedConversationId) return
+    if (!conversations.some((c) => c.id === requestedConversationId)) return
+    selectConversation(requestedConversationId)
+    navigate(".", { replace: true, state: null })
+  }, [requestedConversationId, conversations, selectConversation, navigate])
+
+  // Jump to the bottom when switching conversations.
+  useEffect(() => {
+    window.requestAnimationFrame(() => scrollTimelineToBottom("auto"))
+  }, [activeConversationId])
+
+  // Scroll on new user messages, and follow the streamed answer while the user is near the bottom.
+  useEffect(() => {
+    const lastMessage = messages.at(-1)
+    if (!lastMessage) return
+
+    if (shouldScrollOnNextUserMessageRef.current && lastMessage.role === "user") {
+      shouldScrollOnNextUserMessageRef.current = false
+      window.requestAnimationFrame(() => scrollTimelineToBottom("auto"))
+      return
+    }
+
+    const list = messageListRef.current
+    if (isSending && list) {
+      const distanceToBottom = list.scrollHeight - list.scrollTop - list.clientHeight
+      if (distanceToBottom < NEAR_BOTTOM_PX) scrollTimelineToBottom("auto")
+    }
+  }, [messages, isSending])
+
+  const statusText = chat.isLoadingActive
+    ? "Cargando conversación…"
+    : chat.isWaitingForFirstToken
+      ? "ZenAI está pensando…"
+      : null
+
+  const connection: ConnectionStatus = !isOnline ? "offline" : isRateLimited ? "paused" : "online"
+  const charCount = inputValue.length
+  const isNearLimit = charCount > CLIENT_LIMITS.maxMessageChars * 0.9
+
+  const createConversation = () => {
+    chat.createConversation()
+    setInputValue("")
+    setIsSidebarOpen(false)
+  }
 
   return (
     <AppShell
+      isSidebarOpen={isSidebarOpen}
       sidebar={(
         <SideNav
-          conversations={sortedConversations}
+          conversations={chat.conversations}
           activeConversationId={activeConversationId}
           isOpen={isSidebarOpen}
-          userLabel={user.displayName ?? user.email ?? null}
+          userLabel={userLabel}
+          userEmail={user.displayName ? user.email : null}
           userAvatarUrl={userAvatarUrl}
-          canCreateConversation={Boolean(user)}
+          canCreateConversation={!isSending}
           onClose={() => setIsSidebarOpen(false)}
-          onCreateConversation={handleCreateConversation}
+          onCreateConversation={createConversation}
           onSelectConversation={(conversationId) => {
-            setActiveConversationId(conversationId)
-            setRequestError(null)
-            setRetryAfterSeconds(null)
+            chat.selectConversation(conversationId)
             setIsSidebarOpen(false)
           }}
-          onDeleteConversation={(conversationId) => {
-            const updated = conversations.filter((c) => c.id !== conversationId)
-            setConversations(updated)
-            if (activeConversationId === conversationId) {
-              setActiveConversationId(updated[0]?.id ?? null)
-            }
-          }}
-          onSignIn={() => void signIn()}
+          onDeleteConversation={(conversationId) => void chat.deleteConversation(conversationId)}
           onSignOut={() => void signOut()}
         />
       )}
       header={(
-        <SessionHeader onOpenSidebar={() => setIsSidebarOpen(true)} />
+        <SessionHeader
+          onOpenSidebar={() => setIsSidebarOpen(true)}
+          onNewConversation={createConversation}
+          canCreateConversation={!isSending}
+          model={chat.model}
+          onModelChange={(option) => {
+            chat.setModel(option)
+            savePreferredModel(option)
+          }}
+          isModelLocked={isSending}
+          status={connection}
+        />
       )}
     >
-      <div className="appMain">
-        <section className="chatLayout">
-          <section className="chatShell">
-            <ChatTimeline
-              ref={messageListRef}
-              messages={messages}
-              isSending={isSending}
-              userInitial={userInitial}
-              userAvatarUrl={userAvatarUrl}
+      {!isOnline ? (
+        <div className="offlineBanner" role="alert">
+          <Icon name="wifiOff" size={18} />
+          Sin conexión a internet. Revisa tu red y vuelve a intentar el mensaje.
+        </div>
+      ) : null}
+
+      <ChatTimeline
+        ref={messageListRef}
+        messages={visibleMessages}
+        statusText={statusText}
+        isThinking={chat.isWaitingForFirstToken}
+        streamingMessageId={isSending ? chat.streamingMessageId : null}
+        userInitial={userInitial}
+        userAvatarUrl={userAvatarUrl}
+        onSuggestion={handleSuggestion}
+      />
+
+      <div className="composerDock" role="region" aria-label="Escribir mensaje">
+        <div className="composerDock__inner">
+          {chat.error?.retryAfterSeconds !== undefined ? (
+            <RateLimitAlert
+              key={`${chat.error.message}-${chat.error.retryAfterSeconds}`}
+              message={chat.error.message}
+              retryAfterSeconds={chat.error.retryAfterSeconds}
+              onDismiss={chat.dismissError}
             />
-          </section>
-        </section>
-
-        <div
-          ref={composerDockRef}
-          className="composerDock"
-          aria-label="Message composer"
-        >
-          <div className="composerDock__inner">
-            <form className="composer" onSubmit={handleSubmit}>
-              <div className="composerRow">
-                <textarea
-                  id="chat-input"
-                  className="composerInput"
-                  aria-label="Write a message"
-                  placeholder="Type what you want to ask the assistant…"
-                  value={inputValue}
-                  onChange={(event) => setInputValue(event.target.value)}
-                  onKeyDown={handleInputKeyDown}
-                  disabled={isSending}
-                  rows={1}
-                />
-                <SendButton
-                  label={isSending ? "Thinking..." : "Send"}
-                  disabled={isDisabled}
-                  type="submit"
-                />
+          ) : chat.error ? (
+            <div className="chatAlert chatAlert--danger" role="alert">
+              <Icon name={chat.error.kind === "auth" ? "lock" : chat.error.kind === "network" ? "wifiOff" : "alert"} size={20} className="chatAlert__icon" />
+              <div className="chatAlert__body">
+                <strong className="chatAlert__title">
+                  {chat.error.kind === "auth"
+                    ? "Tu sesión expiró"
+                    : chat.error.kind === "network"
+                      ? "No se envió"
+                      : chat.error.kind === "server"
+                        ? "La respuesta se interrumpió"
+                        : "Algo salió mal"}
+                </strong>
+                <span className="chatAlert__text">{chat.error.message}</span>
+                <span className="chatAlert__actions">
+                  {chat.error.kind === "auth" ? (
+                    <button className="btn btn--sm btn--soft" type="button" onClick={() => void signOut()}>
+                      Iniciar sesión de nuevo
+                    </button>
+                  ) : inputValue.trim() ? (
+                    <button className="btn btn--sm btn--soft" type="button" onClick={() => void handleSend()}>
+                      <Icon name="refresh" size={14} />
+                      Reintentar
+                    </button>
+                  ) : null}
+                  <button className="btn btn--sm btn--secondary" type="button" onClick={chat.dismissError}>
+                    Cerrar
+                  </button>
+                </span>
               </div>
+            </div>
+          ) : chat.syncError ? (
+            <p className="chatSyncNote" role="status">
+              <Icon name="alert" size={16} />
+              {chat.syncError}
+            </p>
+          ) : null}
 
-              {retryAfterSeconds !== null ? (
-                <RateLimitAlert
-                  message={requestError ?? "You've reached today's request limit."}
-                  retryAfterSeconds={retryAfterSeconds}
-                  onDismiss={() => {
-                    setRetryAfterSeconds(null)
-                    setRequestError(null)
-                  }}
-                />
-              ) : requestError ? (
-                <p className="chatError" role="alert">
-                  {requestError}
-                </p>
-              ) : null}
-            </form>
-          </div>
+          <form className="composer" onSubmit={handleSubmit}>
+            <textarea
+              ref={inputRef}
+              id="chat-input"
+              className="composer__input"
+              aria-label="Escribe tu mensaje"
+              placeholder="Escribe un mensaje para ZenAI"
+              value={inputValue}
+              onChange={(event) => setInputValue(event.target.value)}
+              onKeyDown={handleInputKeyDown}
+              disabled={isSending}
+              maxLength={CLIENT_LIMITS.maxMessageChars}
+              rows={1}
+            />
+            <SendButton
+              label={isSending ? SEND_BUTTON_LABELS.busy : SEND_BUTTON_LABELS.send}
+              disabled={isDisabled}
+              isBusy={isSending}
+              type="submit"
+            />
+          </form>
+
+          <p className="composerDock__meta">
+            <span className="composerDock__hint">ZenAI puede equivocarse. Verifica la información importante.</span>
+            {charCount > 0 ? (
+              <span className={`composerDock__count ${isNearLimit ? "composerDock__count--warn" : ""}`}>
+                {charCount.toLocaleString("es")} / {CLIENT_LIMITS.maxMessageChars.toLocaleString("es")}
+              </span>
+            ) : null}
+          </p>
         </div>
       </div>
     </AppShell>

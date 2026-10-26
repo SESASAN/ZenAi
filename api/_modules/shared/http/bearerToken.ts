@@ -3,4 +3,3 @@ export function extractBearerToken(authorizationHeader: string | undefined) {
   const match = authorizationHeader.match(/^Bearer\s+(.+)$/i);
   return match?.[1]?.trim() || null;
 }
-

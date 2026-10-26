@@ -6,6 +6,8 @@ import {
   signInWithPopup,
   signOut,
   createUserWithEmailAndPassword,
+  deleteUser,
+  sendPasswordResetEmail,
   updateProfile,
   type User,
 } from "firebase/auth";
@@ -52,4 +54,22 @@ export async function signUpWithEmail(email: string, password: string, displayNa
 
 export async function signOutUser() {
   return signOut(auth);
+}
+
+export async function sendPasswordReset(email: string) {
+  return sendPasswordResetEmail(auth, email);
+}
+
+export async function updateDisplayName(displayName: string) {
+  const currentUser = auth.currentUser;
+  if (!currentUser) throw new Error("No hay una sesión activa.");
+  await updateProfile(currentUser, { displayName });
+  await currentUser.reload();
+  if (auth.currentUser && authStateListener) authStateListener(auth.currentUser);
+}
+
+export async function deleteCurrentUser() {
+  const currentUser = auth.currentUser;
+  if (!currentUser) throw new Error("No hay una sesión activa.");
+  await deleteUser(currentUser);
 }
