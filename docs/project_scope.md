@@ -1,12 +1,14 @@
 # Project Scope – ZenAI
 
+> **Estado actual:** las tres fases están completas. ZenAI es una app React + Firebase con backend serverless, respuestas en streaming, historial sincronizado en Firestore y despliegue continuo. Ver `docs/tech_stack.md` para el detalle técnico.
+
 ## 1. Descripción General
 
 ZenAI es una aplicación web de tipo chat conversacional diseñada para permitir a los usuarios interactuar con modelos de Inteligencia Artificial mediante una interfaz moderna, intuitiva y escalable.
 
 El objetivo principal del proyecto es construir una plataforma de conversación tipo mensajería (similar a WhatsApp o ChatGPT) donde el usuario pueda enviar mensajes y recibir respuestas generadas por un modelo de lenguaje.
 
-En su primera fase, ZenAI se enfocará en la maquetación estructural y visual (HTML y CSS), preparando una base sólida para futuras fases donde se integrará lógica con JavaScript, consumo de APIs externas y almacenamiento de datos.
+En su primera fase, ZenAI se enfocó en la maquetación estructural y visual (HTML y CSS), preparando una base sólida para futuras fases donde se integrará lógica con JavaScript, consumo de APIs externas y almacenamiento de datos.
 
 ---
 
@@ -52,7 +54,7 @@ Construir una interfaz web conversacional profesional, escalable y preparada par
 
 ## 5. Funcionalidades Principales (Core Features)
 
-### Fase 1 – Maquetación (HTML + CSS)
+### Fase 1 – Maquetación (HTML + CSS) ✅
 
 1. **Interfaz de Chat**
    - Área principal donde se visualizan los mensajes.
@@ -80,7 +82,7 @@ Construir una interfaz web conversacional profesional, escalable y preparada par
 
 ---
 
-### Fase 2 – Interactividad (JavaScript)
+### Fase 2 – Interactividad (JavaScript) ✅
 
 1. Captura del mensaje del usuario.
 2. Renderizado dinámico de mensajes en el DOM.
@@ -92,13 +94,16 @@ Construir una interfaz web conversacional profesional, escalable y preparada par
 
 ---
 
-### Fase 3 – Escalabilidad (React + Firebase)
+### Fase 3 – Escalabilidad (React + Firebase) ✅
 
 1. Componentización completa del chat.
-2. Persistencia de conversaciones en base de datos.
-3. Autenticación de usuarios.
-4. Historial de conversaciones.
-5. Soporte para múltiples chats simultáneos.
+2. Persistencia de conversaciones en base de datos (Firestore, vía backend).
+3. Autenticación de usuarios (email, Google y GitHub).
+4. Historial de conversaciones sincronizado entre dispositivos.
+5. Soporte para múltiples chats.
+6. Respuestas en streaming.
+7. Límite de uso por usuario y protección del backend.
+8. Tests automatizados (unitarios, integración y end-to-end) y CI/CD.
 
 ---
 
@@ -110,7 +115,7 @@ Construir una interfaz web conversacional profesional, escalable y preparada par
 4. El diseño debe priorizar legibilidad y contraste.
 5. El usuario podrá enviar múltiples mensajes consecutivos.
 6. En caso de error de conexión, se mostrará un mensaje claro y amigable.
-7. En la primera versión no se requerirá registro obligatorio.
+7. En la primera versión no se requería registro; desde la Fase 3 el chat requiere iniciar sesión para proteger el uso de la API.
 
 ---
 
@@ -143,7 +148,7 @@ Construir una interfaz web conversacional profesional, escalable y preparada par
 - Documentación técnica detallada.
 - Estructura base del proyecto.
 
-### No Incluido en Fase 1
+### No Incluido en Fase 1 (incorporado en las Fases 2 y 3)
 - Integración real con API.
 - Autenticación.
 - Base de datos.
