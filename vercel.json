@@ -5,6 +5,7 @@
   "outputDirectory": null,
   "rewrites": [
     { "source": "/chat", "destination": "/api/chat" },
+    { "source": "/conversations", "destination": "/api/conversations" },
     { "source": "/health", "destination": "/api/health" }
   ],
   "functions": {

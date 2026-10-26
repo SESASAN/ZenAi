@@ -1,93 +1,162 @@
 import { withSystemPrompt } from "../../../../_shared/chatSystemPrompt.js";
-import type { ChatCompletion, ChatProvider, ChatRequest } from "../../domain/chat.types.js";
 import { ProviderConfigurationError, ProviderRequestError, RateLimitError } from "../../domain/chat.errors.js";
+import type { ChatProvider, ChatRequest, ChatUsage } from "../../domain/chat.types.js";
 
-type ProviderConfig = {
-  baseUrl: string;
-  apiKey?: string;
-  defaultModel: string;
+export type FetchLike = (input: string, init?: RequestInit) => Promise<Response>;
+
+type Env = Record<string, string | undefined>;
+
+const PROVIDER_BASE_URLS: Record<ChatProvider, string> = {
+  groq: "https://api.groq.com/openai/v1",
+  cerebras: "https://api.cerebras.ai/v1",
 };
 
-function resolveProviderConfig(provider: ChatProvider): ProviderConfig {
-  if (provider === "groq") {
-    return {
-      baseUrl: "https://api.groq.com/openai/v1",
-      apiKey: process.env.GROQ_API_KEY,
-      defaultModel: "llama-3.3-70b-versatile",
-    };
-  }
+const PROVIDER_KEY_ENV: Record<ChatProvider, string> = {
+  groq: "GROQ_API_KEY",
+  cerebras: "CEREBRAS_API_KEY",
+};
 
+export type CompletionStream = {
+  provider: ChatProvider;
+  model: string;
+  /** Yields text deltas as they arrive from the provider. */
+  deltas: AsyncIterable<string>;
+  /** Token usage, available once `deltas` is fully consumed (if the provider reports it). */
+  getUsage(): ChatUsage | undefined;
+};
+
+export type OpenStreamOptions = {
+  fetchImpl?: FetchLike;
+  env?: Env;
+  signal?: AbortSignal;
+};
+
+type ProviderChunk = {
+  choices?: Array<{ delta?: { content?: string | null } }>;
+  usage?: RawUsage | null;
+  x_groq?: { usage?: RawUsage | null };
+  error?: { message?: string };
+};
+
+type RawUsage = { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number };
+
+function toUsage(raw: RawUsage | null | undefined): ChatUsage | undefined {
+  if (!raw) return undefined;
   return {
-    baseUrl: "https://api.cerebras.ai/v1",
-    apiKey: process.env.CEREBRAS_API_KEY,
-    defaultModel: "gpt-oss-120b",
+    promptTokens: raw.prompt_tokens,
+    completionTokens: raw.completion_tokens,
+    totalTokens: raw.total_tokens,
   };
 }
 
-export async function requestChatCompletion(
-  request: Required<Pick<ChatRequest, "messages">> & ChatRequest,
-): Promise<ChatCompletion> {
-  const provider: ChatProvider = request.provider ?? "groq";
-  const config = resolveProviderConfig(provider);
+function parseRetryAfter(header: string | null): number {
+  const seconds = header ? Number.parseInt(header, 10) : Number.NaN;
+  return Number.isFinite(seconds) && seconds > 0 ? seconds : 60;
+}
 
-  const apiKey = config.apiKey?.trim();
+/** Parses an OpenAI-compatible SSE stream (`data: {...}` lines, terminated by `data: [DONE]`). */
+export async function* parseSseStream(body: ReadableStream<Uint8Array>): AsyncGenerator<ProviderChunk> {
+  const reader = body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      buffer += decoder.decode(value, { stream: !done });
+
+      let newlineIndex = buffer.indexOf("\n");
+      while (newlineIndex !== -1) {
+        const line = buffer.slice(0, newlineIndex).trim();
+        buffer = buffer.slice(newlineIndex + 1);
+        newlineIndex = buffer.indexOf("\n");
+
+        if (!line.startsWith("data:")) continue;
+        const data = line.slice(5).trim();
+        if (data === "[DONE]") return;
+        if (!data) continue;
+
+        try {
+          yield JSON.parse(data) as ProviderChunk;
+        } catch {
+          throw new ProviderRequestError(`Invalid SSE chunk: ${data.slice(0, 200)}`);
+        }
+      }
+
+      if (done) return;
+    }
+  } finally {
+    reader.releaseLock();
+  }
+}
+
+/**
+ * Opens a streaming chat completion. Resolves once the provider accepted the request,
+ * so HTTP errors (auth, rate limit, etc.) are thrown before any content is streamed.
+ */
+export async function openChatCompletionStream(
+  request: ChatRequest,
+  { fetchImpl = fetch, env = process.env, signal }: OpenStreamOptions = {},
+): Promise<CompletionStream> {
+  const { provider, model } = request;
+  const apiKey = env[PROVIDER_KEY_ENV[provider]]?.trim();
   if (!apiKey) {
-    throw new ProviderConfigurationError(`Falta configurar la API key para ${provider}.`);
+    throw new ProviderConfigurationError(`Missing ${PROVIDER_KEY_ENV[provider]}.`);
   }
 
-  const response = await fetch(`${config.baseUrl}/chat/completions`, {
+  const response = await fetchImpl(`${PROVIDER_BASE_URLS[provider]}/chat/completions`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: request.model ?? config.defaultModel,
+      model,
       messages: withSystemPrompt(request.messages),
-      stream: false,
-      temperature: request.temperature ?? 0.2,
-      ...(request.maxTokens ? { max_tokens: request.maxTokens } : {}),
+      stream: true,
+      temperature: request.temperature,
+      max_tokens: request.maxTokens,
     }),
+    signal,
   });
 
-  type ProviderPayload = {
-    choices?: Array<{ message?: { content?: string | null } }>;
-    usage?: { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number };
-    model?: string;
-    error?: { message?: string };
-  };
-
-  let payload: ProviderPayload = {};
-  try {
-    payload = (await response.json()) as ProviderPayload;
-  } catch {
-    payload = {};
-  }
-
   if (!response.ok) {
-    if (response.status === 429) {
-      const retryAfterHeader = response.headers.get("retry-after");
-      const seconds = retryAfterHeader ? parseInt(retryAfterHeader, 10) : 3600;
-      throw new RateLimitError(Number.isNaN(seconds) ? 3600 : seconds);
-    }
+    const detail = await response.text().catch(() => "");
 
-    const message = payload?.error?.message;
-    throw new ProviderRequestError(message || `El provider ${provider} respondió con estado ${response.status}.`);
+    if (response.status === 429) {
+      throw new RateLimitError(
+        parseRetryAfter(response.headers.get("retry-after")),
+        "The AI provider is busy right now. Please try again shortly.",
+      );
+    }
+    if (response.status === 401 || response.status === 403) {
+      throw new ProviderConfigurationError(`${provider} rejected the API key (${response.status}): ${detail.slice(0, 300)}`);
+    }
+    throw new ProviderRequestError(`${provider} responded ${response.status}: ${detail.slice(0, 300)}`);
   }
 
-  const content = payload?.choices?.[0]?.message?.content?.trim();
-  if (!content) {
-    throw new ProviderRequestError(`El provider ${provider} no devolvió contenido usable.`);
+  if (!response.body) {
+    throw new ProviderRequestError(`${provider} returned an empty body.`);
+  }
+
+  const body = response.body;
+  let usage: ChatUsage | undefined;
+
+  async function* deltas(): AsyncGenerator<string> {
+    for await (const chunk of parseSseStream(body)) {
+      if (chunk.error) {
+        throw new ProviderRequestError(`${provider} stream error: ${chunk.error.message ?? "unknown"}`);
+      }
+      usage = toUsage(chunk.usage ?? chunk.x_groq?.usage) ?? usage;
+      const content = chunk.choices?.[0]?.delta?.content;
+      if (content) yield content;
+    }
   }
 
   return {
-    message: { role: "assistant", content },
     provider,
-    model: payload?.model ?? request.model ?? config.defaultModel,
-    usage: {
-      promptTokens: payload?.usage?.prompt_tokens,
-      completionTokens: payload?.usage?.completion_tokens,
-      totalTokens: payload?.usage?.total_tokens,
-    },
+    model,
+    deltas: deltas(),
+    getUsage: () => usage,
   };
 }

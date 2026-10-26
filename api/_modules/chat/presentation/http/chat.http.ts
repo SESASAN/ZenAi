@@ -1,79 +1,98 @@
-import { AuthRequiredError, InvalidTokenError } from "../../../auth/domain/auth.errors.js";
-import { verifyFirebaseIdToken } from "../../../auth/application/verifyFirebaseIdToken.js";
-import { extractBearerToken } from "../../../shared/http/bearerToken.js";
-import { ChatValidationError, ProviderConfigurationError, ProviderRequestError, RateLimitError } from "../../domain/chat.errors.js";
+import { authenticateRequest } from "../../../auth/application/authenticateRequest.js";
+import type { TokenVerifier } from "../../../auth/domain/auth.types.js";
+import { applyCorsHeaders } from "../../../shared/http/cors.js";
+import { toErrorResponse } from "../../../shared/http/errorResponse.js";
+import { sendJson, sendNoContent } from "../../../shared/http/json.js";
+import type { HttpRequest, HttpResponse } from "../../../shared/http/types.js";
+import { executeChat, type ChatDependencies } from "../../application/executeChat.js";
 import { parseChatRequest } from "../../application/parseChatRequest.js";
-import { executeChat } from "../../application/executeChat.js";
 
-type RequestLike = {
-  method?: string;
-  headers?: Record<string, string | undefined>;
-  body?: unknown;
+export type ChatHttpDependencies = ChatDependencies & {
+  verifyToken: TokenVerifier;
+  env?: Record<string, string | undefined>;
 };
 
-type ResponseLike = {
-  statusCode: number;
-  setHeader(name: string, value: string): void;
-  end(body?: string): void;
-};
+/** Stream events, one JSON object per line (application/x-ndjson). */
+export type ChatStreamEvent =
+  | { type: "delta"; content: string }
+  | ({ type: "done" } & Awaited<ReturnType<typeof executeChat>>)
+  | { type: "error"; status: number; error: string; retryAfterSeconds?: number };
 
-function json(res: ResponseLike, statusCode: number, body: unknown) {
-  res.statusCode = statusCode;
-  res.setHeader("Content-Type", "application/json; charset=utf-8");
-  res.end(JSON.stringify(body));
+function startStream(res: HttpResponse) {
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "application/x-ndjson; charset=utf-8");
+  res.setHeader("Cache-Control", "no-cache, no-transform");
+  res.setHeader("X-Accel-Buffering", "no");
+  res.flushHeaders?.();
 }
 
-export async function handleChatHttp(req: RequestLike, res: ResponseLike) {
+function writeEvent(res: HttpResponse, event: ChatStreamEvent) {
+  res.write?.(`${JSON.stringify(event)}\n`);
+}
+
+export async function handleChatHttp(req: HttpRequest, res: HttpResponse, deps: ChatHttpDependencies) {
+  if (!applyCorsHeaders(req, res, "POST, OPTIONS", deps.env)) {
+    sendJson(res, 403, { error: "Origin not allowed." });
+    return;
+  }
   if (req.method === "OPTIONS") {
-    res.statusCode = 204;
-    res.end();
+    sendNoContent(res);
+    return;
+  }
+  if (req.method !== "POST") {
+    res.setHeader("Allow", "POST, OPTIONS");
+    sendJson(res, 405, { error: "Method Not Allowed" });
     return;
   }
 
-  if (req.method !== "POST") {
-    json(res, 405, { error: "Method Not Allowed" });
-    return;
-  }
+  const abort = new AbortController();
+  res.on?.("close", () => {
+    if (!res.writableEnded) abort.abort();
+  });
+
+  let streamStarted = false;
 
   try {
-    const token = extractBearerToken(req.headers?.authorization);
-    if (!token) {
-      throw new AuthRequiredError();
+    const { uid } = await authenticateRequest(req, deps.verifyToken);
+    const request = parseChatRequest(req.body);
+    const canStream = request.stream && typeof res.write === "function";
+
+    const result = await executeChat({
+      uid,
+      request,
+      deps,
+      signal: abort.signal,
+      onDelta: canStream
+        ? (content) => {
+            if (!streamStarted) {
+              startStream(res);
+              streamStarted = true;
+            }
+            writeEvent(res, { type: "delta", content });
+          }
+        : undefined,
+    });
+
+    if (canStream) {
+      if (!streamStarted) startStream(res);
+      writeEvent(res, { type: "done", ...result });
+      res.end();
+      return;
     }
 
-    const decoded = await verifyFirebaseIdToken(token);
-    const chatRequest = parseChatRequest(req.body);
-    const completion = await executeChat({ uid: decoded.uid, request: chatRequest });
-
-    json(res, 200, completion);
+    sendJson(res, 200, result);
   } catch (error) {
-    if (error instanceof RateLimitError) {
-      json(res, 429, { error: error.message, retryAfterSeconds: error.retryAfterSeconds });
+    if (abort.signal.aborted) {
+      if (!res.writableEnded) res.end();
       return;
     }
 
-    if (error instanceof ChatValidationError) {
-      json(res, 400, { error: error.message });
+    const { status, body } = toErrorResponse(error, deps.log);
+    if (streamStarted) {
+      writeEvent(res, { type: "error", status, ...body });
+      res.end();
       return;
     }
-
-    if (error instanceof AuthRequiredError || error instanceof InvalidTokenError) {
-      const message = error instanceof Error ? error.message : "Necesitás iniciar sesión para usar el chat.";
-      json(res, 401, { error: message });
-      return;
-    }
-
-    if (error instanceof ProviderConfigurationError) {
-      json(res, 500, { error: error.message });
-      return;
-    }
-
-    if (error instanceof ProviderRequestError) {
-      json(res, 502, { error: error.message });
-      return;
-    }
-
-    const message = error instanceof Error ? error.message : "Error interno al generar la respuesta del chat.";
-    json(res, 500, { error: message });
+    sendJson(res, status, body);
   }
 }

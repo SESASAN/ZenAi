@@ -1,6 +1,6 @@
-import { cert, getApps, initializeApp } from "firebase-admin/app";
+import { cert, getApps, initializeApp, type App } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
-import { getFirestore } from "firebase-admin/firestore";
+import { getFirestore, type Firestore } from "firebase-admin/firestore";
 
 type ServiceAccount = {
   project_id?: string;
@@ -8,17 +8,11 @@ type ServiceAccount = {
   private_key?: string;
 };
 
-function parseServiceAccountFromEnv(): ServiceAccount | null {
-  const raw = process.env.FIREBASE_SERVICE_ACCOUNT_JSON?.trim();
+export function parseServiceAccount(raw: string | undefined): ServiceAccount | null {
+  const value = raw?.trim();
+  if (!value) return null;
 
-  if (!raw) {
-    return null;
-  }
-
-  const jsonText = raw.startsWith("{")
-    ? raw
-    : Buffer.from(raw, "base64").toString("utf8");
-
+  const jsonText = value.startsWith("{") ? value : Buffer.from(value, "base64").toString("utf8");
   const parsed = JSON.parse(jsonText) as ServiceAccount;
 
   if (typeof parsed.private_key === "string") {
@@ -28,11 +22,14 @@ function parseServiceAccountFromEnv(): ServiceAccount | null {
   return parsed;
 }
 
-function getAdminApp() {
+let db: Firestore | undefined;
+
+/** Lazily initialized so importing this module never requires credentials (e.g. in tests). */
+export function getAdminApp(): App {
   const existing = getApps()[0];
   if (existing) return existing;
 
-  const serviceAccount = parseServiceAccountFromEnv();
+  const serviceAccount = parseServiceAccount(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
 
   if (serviceAccount?.client_email && serviceAccount.private_key) {
     return initializeApp({
@@ -41,10 +38,18 @@ function getAdminApp() {
     });
   }
 
-  // Fallback: Application Default Credentials (por ejemplo, usando GOOGLE_APPLICATION_CREDENTIALS).
+  // Fallback: Application Default Credentials (e.g. GOOGLE_APPLICATION_CREDENTIALS).
   return initializeApp();
 }
 
-export const adminApp = getAdminApp();
-export const adminAuth = getAuth(adminApp);
-export const adminDb = getFirestore(adminApp);
+export function getAdminAuth() {
+  return getAuth(getAdminApp());
+}
+
+export function getAdminDb(): Firestore {
+  if (!db) {
+    db = getFirestore(getAdminApp());
+    db.settings({ ignoreUndefinedProperties: true });
+  }
+  return db;
+}
