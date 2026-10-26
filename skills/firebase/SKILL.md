@@ -117,8 +117,8 @@ for (const key of requiredEnvVars) {
 ## Commands
 
 ```bash
-npm install firebase
-npm run lint
+pnpm add firebase
+pnpm lint
 ```
 
 ## Resources

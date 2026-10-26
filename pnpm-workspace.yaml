@@ -1,0 +1,8 @@
+allowBuilds:
+  '@firebase/util': false
+  esbuild: false
+  protobufjs: false
+
+# Security fix kept from the npm setup: newer grpc-js for the Firestore client.
+overrides:
+  '@firebase/firestore>@grpc/grpc-js': ^1.14.6
