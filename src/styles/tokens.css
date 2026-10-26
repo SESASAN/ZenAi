@@ -1,0 +1,83 @@
+/* ZenAI design tokens (design_system.md v2.1).
+   The ground is always neutral graphite; each theme only swaps the accent. */
+:root {
+  color-scheme: dark;
+
+  /* Grounds and surfaces */
+  --bg-menu: #111113;
+  --bg: #161618;
+  --surface-sunken: #0f0f11;
+  --surface-soft: #1a1a1d;
+  --surface-raised: #1c1c1f;
+  --surface: #212124;
+  --surface-2: #232327;
+  --surface-hover: #26262a;
+  --bubble-user: #2a2a2e;
+
+  /* Lines */
+  --line-soft: #222226;
+  --line-row: #26262a;
+  --line: #2c2c30;
+  --line-strong: #3a3a3f;
+
+  /* Text */
+  --text: #ececee;
+  --text-ai: #e4e4e8;
+  --text-muted: #c4c4ca;
+  --text-2: #a1a1a8;
+  --text-3: #8a8a92;
+  --text-disabled: #6e6e76;
+
+  /* States */
+  --warning: #e8b14f;
+  --warning-border: #3a3328;
+  --danger: #f07a85;
+  --danger-strong: #e0565f;
+  --danger-bg: #2a1c1e;
+  --danger-border: #45282c;
+  --danger-text: #f3d6d9;
+  --on-danger: #2a0b0f;
+
+  /* Code */
+  --code-keyword: #c3a6ff;
+  --code-function: #7fd9bc;
+  --code-string: #f2c077;
+  --code-comment: #7a7a82;
+
+  /* Accent (default: jade) */
+  --accent: #5bc8a6;
+  --accent-hover: #74d4b5;
+  --on-accent: #0b1f18;
+  --accent-soft: color-mix(in srgb, var(--accent) 8%, transparent);
+  --accent-ring: color-mix(in srgb, var(--accent) 18%, transparent);
+  --accent-border: color-mix(in srgb, var(--accent) 28%, transparent);
+  --accent-selection: color-mix(in srgb, var(--accent) 32%, transparent);
+
+  /* Type */
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-bubble: 20px;
+  --radius-composer: 24px;
+  --radius-pill: 999px;
+
+  /* Layout */
+  --sidebar-width: 280px;
+  --reading-width: 760px;
+
+  --shadow-pop: 0 16px 40px -12px rgba(0, 0, 0, 0.7);
+  --shadow-soft: 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+[data-theme="neon"] { --accent: #5cc3d6; --accent-hover: #7dd0df; --on-accent: #08202a; }
+[data-theme="violet"] { --accent: #a78bfa; --accent-hover: #b9a2fb; --on-accent: #1a1033; }
+[data-theme="sunset"] { --accent: #e39a55; --accent-hover: #eaae76; --on-accent: #2a1607; }
+[data-theme="red"] { --accent: #e07a7a; --accent-hover: #e79595; --on-accent: #2a0e0e; }
+[data-theme="yellow"] { --accent: #e3c064; --accent-hover: #eacd85; --on-accent: #2a2006; }
+[data-theme="white"] { --accent: #d4d4d8; --accent-hover: #e4e4e7; --on-accent: #161618; }

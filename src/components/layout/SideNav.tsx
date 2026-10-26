@@ -1,17 +1,24 @@
+import { useMemo, useState } from "react"
+import { Link } from "react-router-dom"
+
 import type { ChatConversation } from "@/services/chat/chatStorage"
+import { Icon } from "@/components/ui/Icon"
+import { ZenLogo } from "@/components/ui/ZenMark"
+import { UserAvatar } from "@/components/ui/UserAvatar"
+import { groupConversationsByDate } from "@/services/chat/conversationGroups"
 
 interface SideNavProps {
   conversations: ChatConversation[]
   activeConversationId: string | null
   isOpen: boolean
   userLabel?: string | null
+  userEmail?: string | null
   userAvatarUrl?: string | null
   canCreateConversation: boolean
   onClose: () => void
   onCreateConversation: () => void
   onSelectConversation: (conversationId: string) => void
   onDeleteConversation: (conversationId: string) => void
-  onSignIn: () => void
   onSignOut: () => void
 }
 
@@ -20,17 +27,26 @@ export function SideNav({
   activeConversationId,
   isOpen,
   userLabel,
+  userEmail,
   userAvatarUrl,
   canCreateConversation,
   onClose,
   onCreateConversation,
   onSelectConversation,
   onDeleteConversation,
-  onSignIn,
-  onSignOut
+  onSignOut,
 }: SideNavProps) {
-  const initial = (userLabel ?? "Z").slice(0, 1).toUpperCase()
-  const showAvatar = Boolean(userAvatarUrl)
+  const [query, setQuery] = useState("")
+
+  const groups = useMemo(() => {
+    const term = query.trim().toLowerCase()
+    const visible = term
+      ? conversations.filter((c) =>
+          `${c.title} ${c.preview ?? ""} ${c.messages.map((m) => m.content).join(" ")}`.toLowerCase().includes(term),
+        )
+      : conversations
+    return groupConversationsByDate(visible)
+  }, [conversations, query])
 
   return (
     <>
@@ -40,22 +56,13 @@ export function SideNav({
         aria-hidden="true"
       />
 
-      <aside className={`sideNav ${isOpen ? "sideNav--open" : ""}`}>
+      <aside className={`sideNav ${isOpen ? "sideNav--open" : ""}`} aria-label="Menú">
         <div className="sideNav__header">
-          <div>
-            <p className="sideNav__brand">ZenAI</p>
-            <p className="sideNav__tagline">Atmospheric Intelligence</p>
-          </div>
-
-          <button
-            className="sideNav__close"
-            type="button"
-            onClick={onClose}
-            aria-label="Close navigation"
-          >
-            <span className="material-symbols-outlined" aria-hidden="true">
-              close
-            </span>
+          <Link to="/chat" className="sideNav__brand" onClick={onClose}>
+            <ZenLogo />
+          </Link>
+          <button className="iconBtn sideNav__close" type="button" onClick={onClose} aria-label="Cerrar menú">
+            <Icon name="close" size={20} />
           </button>
         </div>
 
@@ -65,83 +72,79 @@ export function SideNav({
           onClick={onCreateConversation}
           disabled={!canCreateConversation}
         >
-          <span aria-hidden="true">+</span>
-          New Chat
+          <Icon name="plus" size={16} />
+          Nueva conversación
         </button>
 
-        <section className="sideNav__conversations" aria-label="Conversation list">
-          <div className="sideNav__conversationsHeader">
-            <p className="sideNav__sectionLabel">Conversations</p>
-          </div>
+        <label className="sideNav__search">
+          <Icon name="search" size={16} />
+          <span className="sr-only">Buscar conversaciones</span>
+          <input
+            type="search"
+            placeholder="Buscar"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+          />
+        </label>
 
-          <div className="sideNav__conversationList">
-            {conversations.map((conversation) => {
-              const isActive = conversation.id === activeConversationId
-              const preview = conversation.messages.at(-1)?.content ?? "No messages yet"
-
-              return (
-                <div
-                  key={conversation.id}
-                  className={`sideNav__conversationItem ${isActive ? "sideNav__conversationItem--active" : ""}`}
-                >
-                  <button
-                    className="sideNav__conversationContent"
-                    type="button"
-                    onClick={() => onSelectConversation(conversation.id)}
-                  >
-                    <span className="sideNav__conversationTitle">{conversation.title}</span>
-                    <span className="sideNav__conversationPreview">{preview}</span>
-                  </button>
-
-                  <button
-                    className="sideNav__deleteButton"
-                    type="button"
-                    onClick={() => onDeleteConversation(conversation.id)}
-                    aria-label="Delete chat"
-                  >
-                    <span className="material-symbols-outlined" aria-hidden="true">
-                      delete
-                    </span>
-                  </button>
-                </div>
-              )
-            })}
-          </div>
+        <section className="sideNav__conversations" aria-label="Conversaciones">
+          {groups.length === 0 ? (
+            <p className="sideNav__empty">
+              {query ? "Ninguna conversación coincide con tu búsqueda." : "Tus conversaciones aparecerán aquí."}
+            </p>
+          ) : (
+            groups.map((group) => (
+              <div key={group.label} className="sideNav__group">
+                <p className="sideNav__groupLabel">{group.label}</p>
+                <ul className="sideNav__list">
+                  {group.items.map((conversation) => {
+                    const isActive = conversation.id === activeConversationId
+                    return (
+                      <li
+                        key={conversation.id}
+                        className={`sideNav__item ${isActive ? "sideNav__item--active" : ""}`}
+                      >
+                        <button
+                          className="sideNav__itemButton"
+                          type="button"
+                          aria-current={isActive ? "page" : undefined}
+                          onClick={() => onSelectConversation(conversation.id)}
+                        >
+                          {conversation.title}
+                        </button>
+                        <button
+                          className="iconBtn sideNav__delete"
+                          type="button"
+                          onClick={() => onDeleteConversation(conversation.id)}
+                          aria-label={`Borrar conversación: ${conversation.title}`}
+                        >
+                          <Icon name="trash" size={16} />
+                        </button>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+            ))
+          )}
         </section>
 
         <div className="sideNav__footer">
-          <div className="sideNav__profile">
-            <div className="sideNav__avatar" aria-hidden="true">
-              {showAvatar ? (
-                <img
-                  className="sideNav__avatarImage"
-                  src={userAvatarUrl ?? ""}
-                  alt=""
-                  loading="lazy"
-                  referrerPolicy="no-referrer"
-                />
-              ) : (
-                initial
-              )}
-            </div>
-
-            <div className="sideNav__profileCopy">
-              <span className="sideNav__profileName">{userLabel ?? "Guest"}</span>
-            </div>
-          </div>
-
-          {userLabel ? (
-            <button className="sideNav__authButton" type="button" onClick={onSignOut}>
-              Sign out
-            </button>
-          ) : (
-            <button className="sideNav__authButton" type="button" onClick={onSignIn}>
-              Sign in
-            </button>
-          )}
+          <Link to="/ajustes/perfil" className="sideNav__profile" onClick={onClose}>
+            <UserAvatar name={userLabel} photoUrl={userAvatarUrl} size={32} />
+            <span className="sideNav__profileCopy">
+              <span className="sideNav__profileName">{userLabel ?? "Tu cuenta"}</span>
+              {userEmail ? <span className="sideNav__profileEmail">{userEmail}</span> : null}
+            </span>
+          </Link>
+          <Link to="/ajustes" className="iconBtn" aria-label="Configuración" onClick={onClose}>
+            <Icon name="settings" />
+          </Link>
+          <button className="iconBtn" type="button" onClick={onSignOut} aria-label="Cerrar sesión">
+            <Icon name="logout" />
+          </button>
         </div>
       </aside>
     </>
   )
 }
-

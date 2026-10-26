@@ -9,6 +9,9 @@ export type AuthContextValue = {
   signUpWithEmail: (email: string, password: string, displayName?: string) => Promise<void>;
   signInWithGithub: () => Promise<void>;
   signOut: () => Promise<void>;
+  sendPasswordReset: (email: string) => Promise<void>;
+  updateDisplayName: (displayName: string) => Promise<void>;
+  deleteAccount: () => Promise<void>;
 };
 
 export const AuthContext = createContext<AuthContextValue | null>(null);

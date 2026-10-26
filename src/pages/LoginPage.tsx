@@ -1,10 +1,11 @@
 import { useState, useEffect, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/services/firebase/useAuth";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { getAuthErrorMessage } from "@/services/firebase/authErrors";
+import { AuthLayout, SocialButtons } from "@/components/site/AuthLayout";
+import { Icon } from "@/components/ui/Icon";
 
 export function LoginPage() {
-  const baseUrl = import.meta.env.BASE_URL;
   const navigate = useNavigate();
   const { user, signIn, signInWithGithub, signInWithEmail } = useAuth();
   const [email, setEmail] = useState("");
@@ -18,183 +19,85 @@ export function LoginPage() {
     }
   }, [user, navigate]);
 
-  const handleEmailAuth = async (e: FormEvent) => {
+  const run = async (action: () => Promise<void>) => {
+    setError(null);
+    setIsLoading(true);
+    try {
+      await action();
+      navigate("/chat", { replace: true });
+    } catch (err) {
+      setError(getAuthErrorMessage(err));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleEmailAuth = (e: FormEvent) => {
     e.preventDefault();
-    setError(null);
-    setIsLoading(true);
-
-    try {
-      await signInWithEmail(email, password);
-      navigate("/chat", { replace: true });
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Authentication failed";
-      setError(message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleGoogleSignIn = async () => {
-    setError(null);
-    setIsLoading(true);
-    try {
-      await signIn();
-      navigate("/chat", { replace: true });
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Google sign-in failed";
-      setError(message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleGithubSignIn = async () => {
-    setError(null);
-    setIsLoading(true);
-    try {
-      await signInWithGithub();
-      navigate("/chat", { replace: true });
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "GitHub sign-in failed";
-      setError(message);
-    } finally {
-      setIsLoading(false);
-    }
+    void run(() => signInWithEmail(email, password));
   };
 
   return (
-    <div className="login-page">
-      <div className="login-atmospheric">
-        <div className="login-glow login-glow--top" />
-        <div className="login-glow login-glow--bottom" />
-        <div className="login-bg-glow" />
-      </div>
+    <AuthLayout>
+      <h1 className="authPage__title">Inicia sesión</h1>
+      <p className="authPage__subtitle">Retoma tus conversaciones donde las dejaste.</p>
 
-      <div className="login-theme-toggle">
-        <ThemeToggle />
-      </div>
+      <SocialButtons onGoogle={() => void run(signIn)} onGithub={() => void run(signInWithGithub)} disabled={isLoading} />
 
-      <main className="login-container">
-        <div className="login-branding">
-          <h1 className="login-title">ZenAI</h1>
-          <p className="login-tagline">Enter the Digital Sanctuary</p>
+      <p className="divider authPage__divider">o con tu correo</p>
+
+      <form className="authForm" onSubmit={handleEmailAuth} noValidate={false}>
+        <div className="field">
+          <label htmlFor="login-email" className="field__label">Correo electrónico</label>
+          <input
+            className="input"
+            id="login-email"
+            autoComplete="email"
+            placeholder="tu@correo.com"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={isLoading}
+            required
+          />
         </div>
 
-        <div className="login-card">
-          <header className="login-card-header">
-            <h2 className="login-card-title">Welcome Back</h2>
-            <p className="login-card-subtitle">
-              Please enter your details to continue
-            </p>
-          </header>
-
-          <form className="login-form" onSubmit={handleEmailAuth}>
-            <div className="login-field">
-              <label className="login-label">Email Address</label>
-              <div className="login-input-wrapper">
-                <span className="login-input-icon material-symbols-outlined">alternate_email</span>
-                <input
-                  className="login-input"
-                  placeholder="name@company.com"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={isLoading}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="login-field">
-              <div className="login-field-header">
-                <label className="login-label">Password</label>
-                <a className="login-forgot" href="#">
-                  Forgot?
-                </a>
-              </div>
-              <div className="login-input-wrapper">
-                <span className="login-input-icon material-symbols-outlined">lock</span>
-                <input
-                  className="login-input"
-                  placeholder="••••••••"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={isLoading}
-                  required
-                  minLength={6}
-                />
-              </div>
-            </div>
-
-            {error && <p className="login-error" role="alert">{error}</p>}
-
-            <button
-              className="login-submit"
-              type="submit"
-              disabled={isLoading}
-            >
-              <div className="login-submit-bg" />
-              <span className="login-submit-text">
-                {isLoading ? "Please wait..." : "Sign In"}
-              </span>
-            </button>
-          </form>
-
-          <div className="login-divider">
-            <div className="login-divider-line" />
-            <span className="login-divider-text">Or continue with</span>
-            <div className="login-divider-line" />
+        <div className="field">
+          <div className="field__row">
+            <label htmlFor="login-password" className="field__label">Contraseña</label>
+            <Link className="authForm__aside" to="/recuperar">¿La olvidaste?</Link>
           </div>
+          <input
+            className="input"
+            id="login-password"
+            autoComplete="current-password"
+            placeholder="Mínimo 6 caracteres"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={isLoading}
+            aria-invalid={error ? true : undefined}
+            aria-describedby={error ? "login-error" : undefined}
+            required
+            minLength={6}
+          />
+        </div>
 
-          <div className="login-social">
-            <button
-              className="login-social-btn"
-              onClick={handleGoogleSignIn}
-              disabled={isLoading}
-            >
-              <img
-                alt="Google"
-                className="login-social-icon"
-                src={`${baseUrl}google-icon-logo-svgrepo-com.svg`}
-              />
-              <span>Google</span>
-            </button>
-            <button
-              className="login-social-btn"
-              onClick={handleGithubSignIn}
-              disabled={isLoading}
-            >
-              <img
-                alt="GitHub"
-                className="login-social-icon"
-                src={`${baseUrl}github-white.svg`}
-              />
-              <span>GitHub</span>
-            </button>
-          </div>
-
-          <p className="login-footer">
-            Don't have an account?{" "}
-            <Link className="login-footer-link" to="/register">
-              Create access
-            </Link>
+        {error ? (
+          <p id="login-error" className="authForm__error" role="alert">
+            <Icon name="alert" size={16} />
+            {error}
           </p>
-        </div>
+        ) : null}
 
-        <footer className="login-compliance">
-          <div className="login-compliance-item">
-            <span className="login-compliance-icon material-symbols-outlined">verified_user</span>
-            <span>End-to-End Encrypted</span>
-          </div>
-          <div className="login-compliance-item">
-            <span className="login-compliance-icon material-symbols-outlined">shield</span>
-            <span>ISO 27001 Certified</span>
-          </div>
-        </footer>
-      </main>
+        <button className="btn btn--primary btn--block" type="submit" disabled={isLoading}>
+          {isLoading ? "Entrando…" : "Iniciar sesión"}
+        </button>
+      </form>
 
-      <div className="login-bottom-bar" />
-    </div>
+      <p className="authPage__switch">
+        ¿No tienes cuenta? <Link to="/register">Créala aquí</Link>
+      </p>
+    </AuthLayout>
   );
 }

@@ -1,209 +1,184 @@
+/* Markdown inside ZenAI answers (also used by the legacy MessageBubble). */
 .row {
   display: flex;
-  width: 100%;
 }
 
 .userRow {
   justify-content: flex-end;
 }
 
-.assistantRow {
-  justify-content: flex-start;
-}
-
 .bubble {
-  max-width: min(720px, 82%);
-  padding: 14px 16px;
-  border-radius: 20px;
-  border: 1px solid transparent;
-  line-height: 1.5;
-  letter-spacing: 0.01em;
-  backdrop-filter: blur(8px);
-  text-align: left;
+  max-width: 75%;
 }
 
 .userBubble {
-  background: var(--message-user-bg);
-  border-color: var(--message-user-border);
-  color: var(--message-user-text);
-  box-shadow: 0 0 14px var(--message-user-shadow);
+  padding: 10px 16px;
+  border-radius: var(--radius-bubble);
+  background: var(--bubble-user);
 }
 
-.assistantBubble {
-  background: var(--message-assistant-bg);
-  border-color: var(--message-assistant-border);
-  color: var(--message-assistant-text);
+.assistantRow,
+.assistantBubble,
+.content,
+.markdownContent {
+  min-width: 0;
 }
 
 .meta {
-  margin-bottom: 8px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.8;
-  text-align: left;
-}
-
-.content {
-  margin: 0;
-  white-space: pre-wrap;
-  word-break: break-word;
-  text-align: left;
-}
-
-.markdownContent {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.markdownContent > * {
-  margin: 0;
+  font-size: 12px;
+  color: var(--text-3);
 }
 
 .markdownParagraph {
-  margin: 0;
-  white-space: pre-wrap;
-  word-break: break-word;
-  line-height: 1.7;
+  margin: 0 0 14px;
+}
+
+.markdownParagraph:last-child {
+  margin-bottom: 0;
 }
 
 .markdownList,
 .markdownOrderedList {
-  margin: 0;
-  padding-left: 1.4rem;
-  display: grid;
-  gap: 8px;
+  margin: 0 0 14px;
+  padding-left: 22px;
 }
 
 .markdownListItem {
-  line-height: 1.6;
+  margin-bottom: 6px;
+}
+
+.markdownListItem::marker {
+  color: var(--text-3);
 }
 
 .markdownLink {
-  color: var(--accent-strong);
+  color: var(--accent);
   text-decoration: underline;
+  text-decoration-thickness: 1px;
   text-underline-offset: 3px;
 }
 
 .inlineCode {
-  padding: 0.15rem 0.45rem;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.08);
-  color: #ffd580;
-  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-  font-size: 0.92em;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.875em;
 }
 
+.markdownBlockquote {
+  margin: 0 0 14px;
+  padding: 2px 0 2px 16px;
+  border-left: 1px solid var(--line-strong);
+  color: var(--text-2);
+}
+
+.tableWrapper {
+  margin: 0 0 14px;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+}
+
+.markdownTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.markdownTableHead,
+.markdownTableCell {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line-row);
+  text-align: left;
+}
+
+.markdownTableHead {
+  background: var(--surface-soft);
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.markdownTable tr:last-child .markdownTableCell {
+  border-bottom: 0;
+}
+
+/* ---------- Code blocks ---------- */
 .codeBlock {
+  margin: 0 0 14px;
+  border-radius: var(--radius-lg);
+  background: var(--surface-sunken);
+  border: 1px solid var(--line-row);
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  background: #141414;
 }
 
 .codeHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 10px 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  background: #141414;
+  padding: 6px 8px 6px 14px;
+  background: var(--surface-soft);
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .codeLanguage {
-  color: #9fb3c8;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  text-transform: lowercase;
 }
 
 .codeCopyButton {
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 999px;
+  height: 28px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: var(--radius-sm);
   background: transparent;
-  color: #dce9f5;
-  cursor: pointer;
-  font-size: 0.82rem;
-  padding: 6px 10px;
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .codeCopyButton:hover {
-  border-color: rgba(255, 255, 255, 0.22);
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--surface-hover);
+  color: var(--text);
 }
 
 .preformatted {
-  margin: 0;
-  max-height: 280px;
-  overflow: auto;
-  white-space: pre;
-  background: #141414;
+  overflow-x: auto;
 }
 
 .codePre {
   margin: 0;
-  padding: 16px;
-  min-width: max-content;
-  background: #141414;
+  padding: 14px 0;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: #d4d4d8;
 }
 
 .codeContent {
   display: block;
-  background: transparent;
-  color: #dce9f5;
-  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-  font-size: 0.92rem;
-  line-height: 1.65;
+  min-width: max-content;
+  font-family: inherit;
 }
 
 .codeLine {
-  display: grid;
-  grid-template-columns: 3ch 1fr;
-  gap: 14px;
+  display: flex;
+  padding-right: 16px;
 }
 
 .codeLineNumber {
-  color: rgba(220, 233, 245, 0.4);
+  flex: none;
+  width: 40px;
+  padding-right: 14px;
   text-align: right;
+  color: #4a4a50;
   user-select: none;
-  pointer-events: none;
+  font-variant-numeric: tabular-nums;
 }
 
 .codeLineText {
   white-space: pre;
-}
-
-.tableWrapper {
-  overflow-x: auto;
-}
-
-.markdownTable {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 420px;
-}
-
-.markdownTableHead,
-.markdownTableCell {
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 10px 12px;
-  text-align: left;
-}
-
-.markdownTableHead {
-  background: rgba(255, 255, 255, 0.05);
-  font-weight: 700;
-}
-
-.markdownBlockquote {
-  margin: 0;
-  padding: 12px 16px;
-  border-left: 3px solid var(--accent-strong);
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 0 12px 12px 0;
-  color: var(--text-secondary);
 }

@@ -1,55 +1,62 @@
 .button {
-    min-width: 124px;
-    height: 46px;
-    padding: 0 18px;
-    border-radius: 999px;
-    border: 1px solid transparent;
-    font-size: 0.95rem;
-    font-weight: 600;
-    letter-spacing: 0.03em;
-    cursor: pointer;
-    transition:
-        transform 0.18s ease,
-        box-shadow 0.18s ease,
-        border-color 0.18s ease,
-        background-color 0.18s ease,
-        opacity 0.18s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--on-accent);
+  transition: background-color 0.15s ease, transform 0.15s var(--ease);
 }
 
-.button:hover {
-    transform: translateY(-1px);
+.button:hover:not(:disabled) {
+  background: var(--accent-hover);
 }
 
-.button:active {
-    transform: scale(0.98);
+.button:active:not(:disabled) {
+  transform: scale(0.94);
 }
 
 .button:disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
-    transform: none;
+  background: var(--line);
+  color: var(--text-disabled);
+  cursor: not-allowed;
 }
 
-.primary {
-    background: var(--button-primary-bg);
-    color: var(--button-primary-text);
-    box-shadow: 0 0 12px var(--button-primary-shadow);
+.busy:disabled {
+  background: var(--surface-hover);
+  color: var(--text-2);
 }
 
-.primary:hover {
-    box-shadow: 0 0 18px var(--button-primary-shadow-hover);
+.countdown {
+  width: auto;
+  min-width: 36px;
+  padding: 0 12px;
+  border-radius: 18px;
+  font-size: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
 }
 
-.secondary {
-    background: var(--button-secondary-bg);
-    color: var(--button-secondary-text);
-    border-color: var(--button-secondary-border);
+.countdown:disabled {
+  color: var(--text-2);
 }
 
-.secondary:hover {
-    border-color: var(--button-secondary-border-hover);
+.spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--line-strong);
+  border-top-color: var(--text);
+  animation: spin 0.8s linear infinite;
 }
 
-.pressed {
-    transform: scale(0.97);
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
