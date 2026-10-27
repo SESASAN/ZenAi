@@ -63,4 +63,14 @@ describe("parseServiceAccount", () => {
     expect(parseServiceAccount(undefined)).toBeNull();
     expect(parseServiceAccount("  ")).toBeNull();
   });
+
+  it("explains a malformed value without echoing it", () => {
+    const secret = '{"private_key": "SECRET-KEY-MATERIAL"';
+    expect(() => parseServiceAccount(secret)).toThrow(/FIREBASE_SERVICE_ACCOUNT_JSON is not valid JSON/);
+    try {
+      parseServiceAccount(secret);
+    } catch (error) {
+      expect(String(error)).not.toContain("SECRET-KEY-MATERIAL");
+    }
+  });
 });
