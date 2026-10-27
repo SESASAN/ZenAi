@@ -4,8 +4,8 @@ import { SiteHeader } from "@/components/site/SiteHeader"
 import { SiteFooter } from "@/components/site/SiteFooter"
 
 /**
- * Draft built from how the app works today. Items marked [PENDIENTE] must be completed
- * (and the text reviewed by someone with legal knowledge) before publishing.
+ * Built from how the app works today. Have someone with legal knowledge review the text
+ * when the product changes.
  */
 export function LegalPage() {
   const { hash } = useLocation()
@@ -31,7 +31,7 @@ export function LegalPage() {
 
         <main className="prose legal__body">
           <h1 id="privacidad" className="prose__title">Privacidad y términos</h1>
-          <p className="legal__updated">Última actualización: <span className="pending">[PENDIENTE: fecha]</span></p>
+          <p className="legal__updated">Última actualización: 26 de octubre de 2026</p>
           <p className="prose__lead">Esta página explica qué información guarda ZenAI cuando lo usas y las reglas básicas del servicio.</p>
 
           <h2 id="datos">Qué datos guardamos</h2>
@@ -65,7 +65,7 @@ export function LegalPage() {
 
           <h2 id="contacto">Contacto</h2>
           <p>
-            Dudas sobre privacidad o los términos: <span className="pending">[PENDIENTE: correo de contacto]</span> o en{" "}
+            Si tienes dudas sobre la privacidad o los términos, abre un reporte en{" "}
             <a href="https://github.com/SESASAN/ZenAi/issues" target="_blank" rel="noopener noreferrer">GitHub Issues</a>.
           </p>
         </main>
