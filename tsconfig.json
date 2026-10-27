@@ -3,12 +3,14 @@
   // backend's base options. Local type-checking still uses the referenced projects below.
   "compilerOptions": {
     "target": "ES2023",
-    "lib": ["ES2023"],
+    "lib": ["ES2023", "DOM"],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "types": ["node"],
     "skipLibCheck": true,
-    "strict": true
+    "strict": true,
+    // Vercel's checker doesn't always resolve firebase-admin's types; keep its log quiet.
+    "noImplicitAny": false
   },
   "files": [],
   "references": [
