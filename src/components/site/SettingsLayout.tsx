@@ -1,16 +1,18 @@
 import type { ReactNode } from "react"
-import { Link, NavLink } from "react-router-dom"
+import { Link, NavLink, useHref } from "react-router-dom"
 import { Icon } from "@/components/ui/Icon"
 
 const LINKS = [
   { to: "/ajustes", label: "Preferencias", end: true },
   { to: "/ajustes/perfil", label: "Perfil y cuenta", end: false },
   { to: "/historial", label: "Historial", end: false },
-  { to: "/acerca", label: "Acerca de ZenAI", end: false },
 ]
 
 /** Settings, profile and history share this layout: side nav on desktop, tabs on phones. */
 export function SettingsLayout({ title, children, aside }: { title: string; children: ReactNode; aside?: ReactNode }) {
+  // Includes the router basename (/ZenAi/ in production) so the new tab opens the right page.
+  const aboutHref = useHref("/acerca")
+
   return (
     <div className="settings">
       <nav className="settings__nav" aria-label="Cuenta">
@@ -29,6 +31,12 @@ export function SettingsLayout({ title, children, aside }: { title: string; chil
               {link.label}
             </NavLink>
           ))}
+          {/* Opens in a new tab so the chat stays where it was. */}
+          <a href={aboutHref} target="_blank" rel="noopener noreferrer" className="settings__tab settings__tab--external">
+            Acerca de ZenAI
+            <Icon name="external" size={14} />
+            <span className="sr-only">(se abre en una pestaña nueva)</span>
+          </a>
         </div>
       </nav>
 

@@ -51,6 +51,14 @@
   white-space: nowrap;
 }
 
+.settings__tab--external {
+  gap: 6px;
+}
+
+.settings__tab--external svg {
+  color: var(--text-3);
+}
+
 .settings__tab:hover {
   color: var(--text);
   background: #1e1e21;
