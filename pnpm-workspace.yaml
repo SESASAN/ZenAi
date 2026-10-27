@@ -6,3 +6,6 @@ allowBuilds:
 # Security fix kept from the npm setup: newer grpc-js for the Firestore client.
 overrides:
   '@firebase/firestore>@grpc/grpc-js': ^1.14.6
+  # jwks-rsa (used by firebase-admin) loads jose with require(); jose 6 is ESM-only and
+  # crashes on Vercel's Node. jose 5 ships a CommonJS build with the same API.
+  'jwks-rsa>jose': ^5.9.6
