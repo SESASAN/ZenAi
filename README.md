@@ -50,7 +50,7 @@ Protecciones del backend: modelos permitidos por proveedor, `maxTokens` y `tempe
 
 ## Desarrollo local
 
-Requisitos: **Node.js 22+** y **pnpm** (la versión está fijada en `packageManager`; con Corepack: `corepack enable`).
+Requisitos: **Node.js 22** y **pnpm** (la versión está fijada en `packageManager`; con Corepack: `corepack enable`).
 
 ```bash
 pnpm install

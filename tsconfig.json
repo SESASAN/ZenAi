@@ -1,4 +1,15 @@
 {
+  // Vercel compiles the serverless functions in api/ with this root file, so it carries the
+  // backend's base options. Local type-checking still uses the referenced projects below.
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "types": ["node"],
+    "skipLibCheck": true,
+    "strict": true
+  },
   "files": [],
   "references": [
     { "path": "./tsconfig.app.json" },

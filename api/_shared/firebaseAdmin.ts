@@ -13,7 +13,15 @@ export function parseServiceAccount(raw: string | undefined): ServiceAccount | n
   if (!value) return null;
 
   const jsonText = value.startsWith("{") ? value : Buffer.from(value, "base64").toString("utf8");
-  const parsed = JSON.parse(jsonText) as ServiceAccount;
+  let parsed: ServiceAccount;
+  try {
+    parsed = JSON.parse(jsonText) as ServiceAccount;
+  } catch {
+    // Don't echo the parser message: it can include part of the private key.
+    throw new Error(
+      "FIREBASE_SERVICE_ACCOUNT_JSON is not valid JSON. Paste the whole service account file (or its base64) as the value.",
+    );
+  }
 
   if (typeof parsed.private_key === "string") {
     parsed.private_key = parsed.private_key.replace(/\\n/g, "\n");
@@ -30,6 +38,10 @@ export function getAdminApp(): App {
   if (existing) return existing;
 
   const serviceAccount = parseServiceAccount(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
+
+  if (serviceAccount && !(serviceAccount.client_email && serviceAccount.private_key)) {
+    throw new Error("FIREBASE_SERVICE_ACCOUNT_JSON is missing client_email or private_key.");
+  }
 
   if (serviceAccount?.client_email && serviceAccount.private_key) {
     return initializeApp({
